@@ -1,10 +1,9 @@
-MFLAGS=-fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
-CFLAGS=-std=gnu99 -ffreestanding -O2 -Wall -Wextra $(MFLAGS)
-ASFLAGS=-ffreestanding
-LDFLAGS=-ffreestanding -O2 -nostdlib
+MFLAGS      =   -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
+CFLAGS      =   -std=gnu99 -ffreestanding -O2 -Wall -Wextra $(MFLAGS)
+ASFLAGS     =   -ffreestanding
 
-OBJDIR=obj
-OBJS=$(OBJDIR)/boot.o $(OBJDIR)/kernel.o
+OBJDIR      =   obj
+OBJS        =   $(OBJDIR)/boot.o $(OBJDIR)/kernel.o
 
 BOOT		=	src/boot.s
 KERNEL		=	src/kernel.c
@@ -33,10 +32,10 @@ build-iso:
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o myos.iso isodir
 
-run-iso:
+run-iso: build-iso
 	qemu-system-i386 -cdrom myos.iso
 
 clean:
-	rm -rf $(OBJDIR) myos.bin
+	rm -rf $(OBJDIR) myos.bin myos.iso isodir
 
 re: clean all

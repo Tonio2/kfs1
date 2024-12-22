@@ -1,4 +1,5 @@
 # Install cross compiler
+```
 mkdir kf1
 cd kf1
 gcc --version
@@ -32,19 +33,25 @@ i386-elf-gcc --version
 cd projects/kf1
 i386-elf-gcc -c test.c -o test.o
 rm test.o
+```
 
 # Does not work
+```
 i386-elf-gcc boot.s -o boot.o
 nasm -f elf32 boot.s -o boot.o
+```
 
 # Create myos.bin
+```
 i386-elf-gcc -ffreestanding -c boot.s -o boot.o
 i386-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i386-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
 grub-file --is-x86-multiboot myos.bin
 echo $?
+```
 
 # Create iso file
+```
 mkdir -p isodir/boot/grub
 cp myos.bin isodir/boot/myos.bin
 cp grub.cfg isodir/boot/grub/grub.cfg
@@ -56,8 +63,10 @@ ls /etc/mtools.conf
 cat /etc/mtools.conf
 grub-mkrescue -o myos.iso isodir
 qemu-system-i386 -cdrom myos.iso
+```
 
 # Remove snap dependencies
+```
 sudo snap remove qemu
 sudo apt updatesudo apt install -y qemu-system-x86
 qemu-system-i386 -cdrom myos.iso
@@ -71,18 +80,34 @@ ldd /usr/bin/qemu-system-i386
 sudo apt updatesudo apt install --reinstall qemu-system-x86
 ldd /usr/bin/qemu-system-i386
 qemu-system-i386 -cdrom myos.iso
+```
 
 # Still not working
+```
 qemu-system-i386 -cdrom myos.iso -boot d
+```
 
 ## Adding boot et echo to grub.cfg
+```
 vim isodir/boot/grub/grub.cfg
 grub-mkrescue -o myos.iso isodir
 grub-file --is-x86-multiboot myos.bin
 qemu-system-i386 -cdrom myos.iso -boot d
 qemu-system-i386 -cdrom myos.iso -serial stdio
+```
 
 ## Verify grub version
+```
 grub-install --version
+```
 
-## Ensure the Multiboot header is in the first 8192 bytes
+## Why the ISO is not bootable
+Even though your grub.cfg is present and you see grub-mkrescue in the Makefile, by default grub-mkrescue can produce an EFI‐only ISO if you only have the EFI GRUB packages installed. For a 32-bit OS you need the i386 BIOS version of GRUB (the “pc” platform) included in your system’s GRUB packages.
+
+On many distros you need to install something like:
+
+```
+sudo apt-get install grub-pc-bin xorriso
+```
+
+so that grub-mkrescue has the needed i386-pc modules to produce a BIOS-bootable ISO. Otherwise you end up with an ISO that has no BIOS‐boot sector, and QEMU’s BIOS can’t see anything to boot from.
