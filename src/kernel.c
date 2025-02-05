@@ -64,9 +64,10 @@ void	terminal_initialize(void) {
 	term.col	= 0;
 	term.color	= LIGHT_GREY | BLACK << 4;
 
-	/* Clear screen and hide the cursor */
+	/* Clear screen and set the cursor */
 	terminal_clear();
-	position_cursor(1, 1);
+	position_cursor(0, 0);
+	position_cursor(24, 79); // just to test
 }
 
 void	kernel_main(void) 
