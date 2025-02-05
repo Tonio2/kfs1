@@ -15,41 +15,29 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 
 
 
-static inline void outb(uint16_t port, uint8_t val) {
-    asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
-}
-
-static inline uint8_t inb(uint16_t port) {
-    uint8_t ret;
-    asm volatile ("inb %1, %0" : "=a"(ret) : "Nd"(port));
-    return ret;
-}
 
 
 
-static void enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
-    // Cursor Start Register (0x0A)
-    outb(0x3D4, 0x0A);
-    outb(0x3D5, (inb(0x3D5) & 0xC0) | cursor_start);
 
-    // Cursor End Register (0x0B)
-    outb(0x3D4, 0x0B);
-    outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
-}
-
-// static void disable_cursor(void) {
+// static void enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
+//     // Cursor Start Register (0x0A)
 //     outb(0x3D4, 0x0A);
-//     outb(0x3D5, 0x20);
+//     outb(0x3D5, (inb(0x3D5) & 0xC0) | cursor_start);
+
+//     // Cursor End Register (0x0B)
+//     outb(0x3D4, 0x0B);
+//     outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
 // }
 
-static void update_cursor(int x, int y) {
-    uint16_t pos = y * VGA_WIDTH + x;
 
-    outb(0x3D4, 0x0F);
-    outb(0x3D5, (uint8_t)(pos & 0xFF));
-    outb(0x3D4, 0x0E);
-    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
-}
+// static void update_cursor(int x, int y) {
+//     uint16_t pos = y * VGA_WIDTH + x;
+
+//     outb(0x3D4, 0x0F);
+//     outb(0x3D5, (uint8_t)(pos & 0xFF));
+//     outb(0x3D4, 0x0E);
+//     outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+// }
 
 // Scrolls the screen up by 1 line
 static void terminal_scroll(void) {
@@ -77,6 +65,8 @@ static void terminal_clear(void) {
     }
 }
 
+extern int hide_cursor(void);
+
 void terminal_initialize(void) {
     terminal_row    = 0;
     terminal_column = 0;
@@ -87,8 +77,8 @@ void terminal_initialize(void) {
     terminal_clear();
 
     // Enable & set the cursor
-    enable_cursor(0, 15);
-    update_cursor(terminal_column, terminal_row);
+    hide_cursor();
+    // update_cursor(terminal_column, terminal_row);
 }
 
 void terminal_setcolor(uint8_t color) {
@@ -117,7 +107,7 @@ void terminal_putchar(char c) {
             }
         }
     }
-    update_cursor(terminal_column, terminal_row);
+    // update_cursor(terminal_column, terminal_row);
 }
 
 void terminal_write(const char* data, uint32_t size) {
@@ -138,7 +128,6 @@ void terminal_writestring(const char* data) {
 
 
 
-extern int my_function(int x);
 
 void kernel_main(void) 
 {
@@ -185,6 +174,4 @@ void kernel_main(void)
     terminal_writestring("Hello, kernel World!8\n");
     terminal_writestring("Hello, kernel World!8\n");
     terminal_writestring("Hello, kernel World!8\n");
-
-	my_function('a');
 }

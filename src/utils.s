@@ -1,15 +1,17 @@
-global my_function
+global hide_cursor
 
-my_function:
-	push ebp		; Standard function prologue
+; Select the Cursor Start Register, and set it's 5th bit to one to hide the cursor
+hide_cursor:
+	push ebp
 	mov ebp, esp
-	mov edx, 0xb800a
-	mov al, [ebp+8]	; Get first argument (from stack)
-	add al, 3		; Add 3
-	mov ah, 0x1f
-	mov word [edx], ax
 
-	pop ebp			; Restore previous base pointer
-	ret				; Return (EAX holds the return value)
+	mov dx, 0x3d4	; VGA register select port
+	mov al, 0x0a	; Cursor Start Register
+	out dx, al
+	mov dx, 0x3d5	; VGA data port
+	mov al, 0x20	; Set bit 5
+	out dx, al
 
+	pop ebp
+	ret
 
