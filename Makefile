@@ -1,41 +1,63 @@
-MFLAGS      =   -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
-CFLAGS      =   -std=gnu99 -ffreestanding -O2 -Wall -Wextra $(MFLAGS)
-ASFLAGS     =   -ffreestanding
+src_path :=		src/
+obj_path :=		obj/
+kern_path :=	iso/boot/
 
-OBJDIR      =   obj
-OBJS        =   $(OBJDIR)/boot.o $(OBJDIR)/kernel.o
+c_obj_path :=	$(obj_path)c/
+c_src := $(wildcard $(src_path)*.c)
+c_obj := $(c_src:$(src_path)%.c=$(c_obj_path)%.o)
 
-BOOT		=	src/boot.s
-KERNEL		=	src/kernel.c
-LINKER		=	src/linker.ld
+asm_obj_path :=	$(obj_path)asm/
+asm_src := $(wildcard $(src_path)*.s)
+asm_obj := $(asm_src:$(src_path)%.s=$(asm_obj_path)%.o)
 
-all: $(OBJDIR) myos.bin
+# -fno-ident : Do not generate special symbols for debug information (remove the comment section)
+CFLAGS = -m32 -c -ffreestanding -fno-builtin \
+         -fno-exceptions -fno-stack-protector \
+         -nostdlib -nodefaultlibs -fno-ident \
+         -I include \
+		 -Wall -Wextra -Werror
 
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
+LDFLAGS  := -m elf_i386 -n -T src/linker.ld
 
-$(OBJDIR)/boot.o: $(BOOT)
-	i386-elf-gcc $(ASFLAGS) -c $(BOOT) -o $(OBJDIR)/boot.o
+kernel_bin :=	$(addprefix $(kern_path), kernel.bin)
+kernel_iso :=	kernel.iso
 
-$(OBJDIR)/kernel.o: $(KERNEL)
-	i386-elf-gcc $(CFLAGS) -c $(KERNEL) -o $(OBJDIR)/kernel.o
+CC      := x86_64-elf-gcc
+LD      := x86_64-elf-ld
+NASM    := nasm
 
-myos.bin: $(OBJS) $(LINKER)
-	@ld -m elf_i386 -T ${LINKER} -o myos.bin $(OBJS)
+# ##############################################################################
 
-run:
-	qemu-system-i386 -kernel myos.bin
+all : $(kernel_iso)
 
-build-iso:
-	mkdir -p isodir/boot/grub
-	cp myos.bin isodir/boot/myos.bin
-	cp grub.cfg isodir/boot/grub/grub.cfg
-	grub-mkrescue -o myos.iso isodir
+# create the bootable iso
+$(kernel_iso): $(kernel_bin)
+	grub-mkrescue -o $(kernel_iso) --compress=xz iso
 
-run-iso: build-iso
-	qemu-system-i386 -cdrom myos.iso
+# compile the kernel
+$(kernel_bin): $(obj_path) $(c_obj) $(asm_obj) 
+	$(LD) $(LDFLAGS) -o $(kernel_bin) $(asm_obj) $(c_obj)
+
+# create build directory
+$(obj_path) :
+	mkdir -p $(asm_obj_path)
+	mkdir -p $(c_obj_path)
+
+# build asm object files in elf 32 (i386 32 bits compatible)
+$(asm_obj_path)%.o : $(src_path)%.s
+	$(NASM) -f elf32 $< -o $@
+
+# build c object files
+$(c_obj_path)%.o : $(src_path)%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR) myos.bin myos.iso isodir
+	$(DOCKER_RUN) rm -rf $(obj_path)
 
-re: clean all
+fclean: clean
+	rm -rf $(kernel_iso) $(kernel_bin)
+
+re: fclean all
+
+
+.PHONY: all clean fclean re

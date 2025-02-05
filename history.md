@@ -106,8 +106,41 @@ Even though your grub.cfg is present and you see grub-mkrescue in the Makefile, 
 
 On many distros you need to install something like:
 
-```
+```bash
 sudo apt-get install grub-pc-bin xorriso
 ```
 
 so that grub-mkrescue has the needed i386-pc modules to produce a BIOS-bootable ISO. Otherwise you end up with an ISO that has no BIOS‐boot sector, and QEMU’s BIOS can’t see anything to boot from.
+
+## Run the cross compiler container 
+Build the container
+```bash
+docker build buildenv -t cross-compiler
+```
+Run an interactive container
+```bash
+docker run --rm -v "$(pwd):/root/cc" -it cross-compiler
+```
+
+## Get info on file
+```bash
+objdump -D iso/boot/kernel.bin
+file iso/boot/kernel.bin
+objdump -s -j .boot iso/boot/kernel.bin
+readelf -x .boot iso/boot/kernel.bin
+hexdump -C iso/boot/kernel.bin | less
+```
+
+## Add own headers
+
+Got this error :
+```bash
+x86_64-elf-gcc  -c src/kernel.c -o obj/c/kernel.o
+In file included from src/kernel.c:3:
+/usr/local/lib/gcc/x86_64-elf/13.2.0/include/stdint.h:9:16: fatal error: stdint.h: No such file or directory
+    9 | # include_next <stdint.h>
+      |                ^~~~~~~~~~
+compilation terminated.
+```
+
+You already have flags like -ffreestanding and -nostdlib to indicate you’re providing your own environment. This means the compiler does not expect to have the standard C library

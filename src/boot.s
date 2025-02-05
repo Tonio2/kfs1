@@ -1,29 +1,32 @@
-.set ALIGN,    1<<0
-.set MEMINFO,  1<<1
-.set FLAGS,    ALIGN | MEMINFO
-.set MAGIC,    0x1BADB002
-.set CHECKSUM, -(MAGIC + FLAGS)
+%define MAGIC 0x1BADB002
+%assign ALIGN 1
+%assign MEMINFO 2
+%assign FLAGS (ALIGN | MEMINFO)  ; Now NASM evaluates this to 3
+%assign CHECKSUM (0x100000000 - (MAGIC + FLAGS))  ; Ensure correct computation
 
-.section .multiboot
-.align 4
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
+global _start
+extern kernel_main
 
-.section .bss
-.align 16
+section .mb_header
+dd MAGIC
+dd FLAGS
+dd CHECKSUM
+
+section .bss
+align 16
 stack_bottom:
-.skip 16384 # 16 KiB
+    resb 16384  ; Reserve 16 KiB for stack
 stack_top:
 
-.section .text
-.global _start
-.type _start, @function
-_start:
-	mov $stack_top, %esp
-	call kernel_main
-	cli
-1:	hlt
-	jmp 1b
+section .text
 
-.size _start, . - _start
+_start:
+    mov esp, stack_top
+    call kernel_main
+    ;hlt
+    cli
+.hang:
+    hlt
+    jmp .hang
+
+

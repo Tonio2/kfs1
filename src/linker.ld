@@ -1,29 +1,38 @@
-OUTPUT_FORMAT(elf32-i386)
-ENTRY(_start)
+ENTRY(start)
 
 SECTIONS
 {
-	. = 2M;
+    . = 1M;
 
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-		*(.multiboot)
-		*(.text)
-	}
+    /* Multiboot header must appear in the first 8KiB. Keep it here at the front. */
+    .boot ALIGN(4):
+    {
+        KEEP(*(.mb_header))
+    }
 
-	.rodata :
-	{
-		*(.rodata)
-	}
+    /* Code (text) section */
+    .text ALIGN(4):
+    {
+        *(.text)       /* Main .text */
+    }
 
-	.data :
-	{
-		*(.data)
-	}
+    /* Read-only data (rodata). */
+    .rodata ALIGN(4):
+    {
+        *(.rodata)
+    }
 
-	.bss :
-	{
-		*(COMMON)
-		*(.bss)
-	}
+    /* Data section (initialized data). */
+    .data ALIGN(4):
+    {
+        *(.data)
+    }
+
+    /* BSS section (uninitialized data). Include COMMON for uninitialized globals. */
+    .bss ALIGN(4):
+    {
+        *(COMMON)
+        *(.bss)
+    }
+
 }
