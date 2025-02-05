@@ -1,1 +1,4 @@
 .vscode
+obj/
+kernel.iso
+iso/boot/kernel.bin
