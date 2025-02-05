@@ -1,73 +1,41 @@
-# MyOS
+# KFS1
 
-MyOS is a simple operating system kernel written in C and assembly for the x86 architecture. This project demonstrates basic kernel development, including setting up a multiboot-compliant kernel, initializing a terminal, and displaying text on the screen.
+KFS1 is a simple operating system kernel written in C and assembly for the x86 architecture. This project demonstrates basic kernel development, including setting up a multiboot-compliant kernel, initializing a terminal, and displaying text on the screen.
 
 ## Prerequisites
 
-To build and run MyOS, you need the following tools installed:
+To build and run KFS1, you need the following tools installed:
 
-- GCC cross-compiler for i386-elf
-- GNU Binutils
-- GRUB
+- Docker
 - QEMU
 
-## Building MyOS
+## Building KFS1
 
-1. Install the cross-compiler and other dependencies:
+1. To build the container, run:
+```sh
+docker build cross_compiler -t cross_compiler_env
+```
 
-    ```sh
-    sudo apt update
-    sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo grub-pc-bin xorriso qemu-system-x86
-    ```
+2. To run the container on windows powershell, run (--rm: kill container if it exists, -i: interactive mode, -t: allocate a terminal to the container):
+```sh
+docker run --rm -it -v "${pwd}:/root/cc" cross_compiler_env
+```
 
-2. Set up the cross-compiler:
+For linux run:
+```sh
+docker run --rm -it -v "$(pwd):/root/cc" cross_compiler_env
+```
 
-    ```sh
-    mkdir ~/cross-compiler
-    cd ~/cross-compiler
-    wget https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.gz
-    tar -xf binutils-2.41.tar.gz
-    wget https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.gz
-    tar -xf gcc-13.2.0.tar.gz
-    mkdir binutils-build gcc-build
-    cd binutils-build
-    ../binutils-2.41/configure --target=i386-elf --prefix=/usr/local/cross --with-sysroot --disable-nls --disable-werror
-    make
-    sudo make install
-    cd ../gcc-build
-    ../gcc-13.2.0/configure --target=i386-elf --prefix=/usr/local/cross --disable-nls --enable-languages=c --without-headers
-    make all-gcc
-    make all-target-libgcc
-    sudo make install-gcc
-    sudo make install-target-libgcc
-    echo 'export PATH=/usr/local/cross/bin:$PATH' >> ~/.zshrc
-    source ~/.zshrc
-    ```
+Once inside the container, simply run make to compile the project.
 
-3. Build the kernel:
-
-    ```sh
-    make
-    ```
-
-4. Create a bootable ISO:
-
-    ```sh
-    make build-iso
-    ```
 
 ## Running MyOS
 
-You can run MyOS using QEMU:
+Don't forget to add qemu folder to the path !
 
+Outside of the container, if the kernel iso has been compiled, to launch it in qemu run:
 ```sh
-make run
-```
-
-or run the ISO image:
-
-```sh
-make run-iso
+qemu-system-i386 -cdrom .\kernel.iso
 ```
 
 ## Project Structure

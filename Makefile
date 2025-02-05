@@ -3,28 +3,26 @@ obj_path :=		obj/
 kern_path :=	iso/boot/
 
 c_obj_path :=	$(obj_path)c/
-c_src := $(wildcard $(src_path)*.c)
-c_obj := $(c_src:$(src_path)%.c=$(c_obj_path)%.o)
+c_src :=		$(wildcard $(src_path)*.c)
+c_obj :=		$(c_src:$(src_path)%.c=$(c_obj_path)%.o)
 
 asm_obj_path :=	$(obj_path)asm/
-asm_src := $(wildcard $(src_path)*.s)
-asm_obj := $(asm_src:$(src_path)%.s=$(asm_obj_path)%.o)
+asm_src :=		$(wildcard $(src_path)*.s)
+asm_obj :=		$(asm_src:$(src_path)%.s=$(asm_obj_path)%.o)
 
 # -fno-ident : Do not generate special symbols for debug information (remove the comment section)
-CFLAGS = -m32 -c -ffreestanding -fno-builtin \
-         -fno-exceptions -fno-stack-protector \
-         -nostdlib -nodefaultlibs -fno-ident \
-         -I include \
-		 -Wall -Wextra -Werror
+CFLAGS =		-m32 -c -ffreestanding -fno-builtin -fno-exceptions \
+				-fno-stack-protector -nostdlib -nodefaultlibs -fno-ident \
+				-I include -Wall -Wextra -Werror
 
-LDFLAGS  := -m elf_i386 -n -T src/linker.ld
+LDFLAGS :=		-m elf_i386 -n -T src/linker.ld
 
 kernel_bin :=	$(addprefix $(kern_path), kernel.bin)
 kernel_iso :=	kernel.iso
 
-CC      := x86_64-elf-gcc
-LD      := x86_64-elf-ld
-NASM    := nasm
+CC :=			x86_64-elf-gcc
+LD :=			x86_64-elf-ld
+NASM :=			nasm
 
 # ##############################################################################
 
