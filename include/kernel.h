@@ -42,4 +42,9 @@ struct term {
 	uint8_t	 color;
 };
 
+void	terminal_putchar(char c);
+void	terminal_write(const char* str);
+
+# include "printk.h"
+
 #endif
