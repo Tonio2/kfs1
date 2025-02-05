@@ -66,7 +66,7 @@ void	terminal_initialize(void) {
 
 	/* Clear screen and hide the cursor */
 	terminal_clear();
-	hide_cursor();
+	position_cursor(1, 1);
 }
 
 void	kernel_main(void) 

@@ -4,7 +4,7 @@
 # define VGA_WIDTH	80
 # define VGA_HEIGHT	25
 
-extern int	hide_cursor(void);
+extern void	position_cursor(int row, int col);
 
 typedef signed char			int8_t;
 typedef short				int16_t;
