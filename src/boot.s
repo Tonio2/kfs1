@@ -1,11 +1,11 @@
-global _start
+global start
 extern kernel_main
 
 ; ##############################################################################
 
 section .text
 
-_start:
+start:
 	mov esp, stack_top
 	call kernel_main
 
