@@ -1,4 +1,6 @@
 #include "kernel.h"
+#include "printk.h"
+#include "io.h"
 
 static struct term	term;
 static uint16_t		*term_buffer = (uint16_t *)0xb8000;

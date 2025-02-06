@@ -1,20 +1,9 @@
-#ifndef KERNEL_H
-# define KERNEL_H
+#pragma once
+
+#include "types.h"
 
 # define VGA_WIDTH	80
 # define VGA_HEIGHT	25
-
-extern void	position_cursor(int row, int col);
-
-typedef signed char			int8_t;
-typedef short				int16_t;
-typedef int					int32_t;
-typedef long long			int64_t;
-
-typedef unsigned char		uint8_t;
-typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
-typedef unsigned long long	uint64_t;
 
 enum vga_color {
 	BLACK = 0,
@@ -43,8 +32,3 @@ struct term {
 
 void	terminal_putchar(char c);
 void	terminal_write(const char* str);
-
-# include "../include/io.h"
-# include "printk.h"
-
-#endif
