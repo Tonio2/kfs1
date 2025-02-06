@@ -1,13 +1,11 @@
 global position_cursor
 
-DEBUG equ 0x2000
-
-; IMPORTANT !!!!! refaire les commentaires !!!!
+; IMPORTANT !!!!! refaire la fonction
 ; Select the Cursor Start Register, and set it's 5th bit to one to hide the cursor
 position_cursor:
 	push ebp
 	mov ebp, esp
-
+                          
 	mov eax, [esp + 8]	; Load row argument
 	mov ecx, 80
 	mul ecx				; multiply eax by 80
@@ -23,7 +21,6 @@ position_cursor:
 	mov dx, 0x3d5		; VGA register control port
 	mov al, cl			; Move the column value (ESI) to AL
 	out dx, al
-	mov byte [DEBUG], al
 
 	; Set the vertical position (row)
 	mov dx, 0x3d4		; VGA register control port
@@ -33,8 +30,6 @@ position_cursor:
 	mov dx, 0x3d5		; VGA register control port
 	mov al, ch			; Move the row value (EDI) to AL
 	out dx, al
-	mov byte [DEBUG + 4], al
 
 	pop ebp
 	ret
-

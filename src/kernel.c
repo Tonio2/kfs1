@@ -1,8 +1,9 @@
 #include "kernel.h"
 #include "printk.h"
+#include "io.h"
 
-static struct term	term;
-static uint16_t		*term_buffer = (uint16_t *)0xb8000;
+static struct term		term;
+static uint16_t * const	term_buffer = (uint16_t *)0xb8000;
 
 /* ########################################################################## */
 
@@ -80,5 +81,4 @@ void	kernel_main(void)
 	}
 	printk("Hello, kernel World! %s\n", "coucouuuuu");
 	printk("Hello, kernel World!");
-
 }
