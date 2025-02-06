@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "printk.h"
 
 static struct term	term;
 static uint16_t		*term_buffer = (uint16_t *)0xb8000;
@@ -51,6 +52,7 @@ void	terminal_putchar(char c)
 		terminal_newline();
 	if (c != '\n')
 		terminal_putchar_at(c, term.col++, term.row);
+	position_cursor(term.row, term.col);
 }
 
 void	terminal_write(const char* str)
@@ -66,14 +68,13 @@ void	terminal_initialize(void) {
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
-	position_cursor(0, 0);
-	position_cursor(24, 79); // just to test
+	position_cursor(term.row, term.col);
 }
 
-void	kernel_main(void) 
+void	kernel_main(void)
 {
 	terminal_initialize();
-	
+
 	for (int i =0; i<5; i++) {
 		printk("Hello, kernel World! %d\n", i);
 	}

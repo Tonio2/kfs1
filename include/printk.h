@@ -1,7 +1,6 @@
-#ifndef PRINTK_H
-# define PRINTK_H
+#pragma once
 
-# include "kernel.h"
+# include "types.h"
 
 typedef __builtin_va_list va_list;
 
@@ -11,5 +10,3 @@ typedef __builtin_va_list va_list;
 
 // printk signature
 void	printk(const char* fmt, ...);
-
-#endif

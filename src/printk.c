@@ -1,4 +1,5 @@
 #include "printk.h"
+#include "kernel.h"
 
 static void print_uint32_hex(uint32_t val) {
 	char buf[9];
