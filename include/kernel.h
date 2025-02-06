@@ -16,7 +16,6 @@ typedef unsigned short		uint16_t;
 typedef unsigned int		uint32_t;
 typedef unsigned long long	uint64_t;
 
-
 enum vga_color {
 	BLACK = 0,
 	BLUE = 1,
@@ -45,6 +44,7 @@ struct term {
 void	terminal_putchar(char c);
 void	terminal_write(const char* str);
 
+# include "../include/io.h"
 # include "printk.h"
 
 #endif

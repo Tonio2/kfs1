@@ -5,6 +5,25 @@ static uint16_t		*term_buffer = (uint16_t *)0xb8000;
 
 /* ########################################################################## */
 
+static void enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
+    // Cursor Start Register (0x0A)
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (inb(0x3D5) & 0xC0) | cursor_start);
+
+    // Cursor End Register (0x0B)
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
+}
+
+static void update_cursor(int x, int y) {
+    uint16_t pos = y * VGA_WIDTH + x;
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
 static uint16_t	vga_entry(char c)
 {
 	return ((uint16_t)c | (uint16_t)term.color << 8);
@@ -51,6 +70,7 @@ void	terminal_putchar(char c)
 		terminal_newline();
 	if (c != '\n')
 		terminal_putchar_at(c, term.col++, term.row);
+	update_cursor(term.col, term.row);
 }
 
 void	terminal_write(const char* str)
@@ -66,8 +86,9 @@ void	terminal_initialize(void) {
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
-	position_cursor(0, 0);
-	position_cursor(24, 79); // just to test
+
+	enable_cursor(14, 15);
+    update_cursor(term.col, term.row);
 }
 
 void	kernel_main(void) 
