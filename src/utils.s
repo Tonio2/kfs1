@@ -2,7 +2,7 @@ global position_cursor
 
 DEBUG equ 0x2000
 
-
+; IMPORTANT !!!!! refaire les commentaires !!!!
 ; Select the Cursor Start Register, and set it's 5th bit to one to hide the cursor
 position_cursor:
 	push ebp
