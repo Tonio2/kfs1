@@ -16,13 +16,13 @@ static uint16_t	vga_entry(char c)
 }
 
 void cpy_term(void) {
-    for (uint16_t i = 0; i < 2000; i++) {
+    for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
         terms[cur_term].buf[i] = term_buffer[i] & 0xFF;
     }
 }
 
 void paste_term(uint8_t term_idx) {
-    for (uint16_t i = 0; i < 2000; i++) {
+    for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
         term_buffer[i] = vga_entry(terms[term_idx].buf[i]);
     }
 }
