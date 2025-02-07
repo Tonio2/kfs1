@@ -24,9 +24,12 @@ CC :=			x86_64-elf-gcc
 LD :=			x86_64-elf-ld
 NASM :=			nasm
 
+DOCKER_RUN :=	docker run --rm -v "$(PWD):/root/cc" cross-compiler
+
 # ##############################################################################
 
-all : $(kernel_iso)
+all : 
+	$(DOCKER_RUN) make $(kernel_iso)
 
 # create the bootable iso
 $(kernel_iso): $(kernel_bin)
