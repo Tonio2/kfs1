@@ -1,11 +1,15 @@
 #include "printk.h"
 #include "kernel.h"
 
-static void print_uint32_hex(uint32_t val) {
-	char buf[9];
+static void print_uint32_hex(uint32_t val)
+{
+	char	buf[9];
+	uint8_t	nibble;
+
 	buf[8] = '\0';
-	for (int i = 7; i >= 0; i--) {
-		uint8_t nibble = val & 0xF;
+	for (int i = 7; i >= 0; i--)
+	{
+		nibble = val & 0xF;
 		buf[i] = (nibble < 10) ? ('0' + nibble) : ('A' + (nibble - 10));
 		val >>= 4;
 	}
@@ -29,32 +33,40 @@ static void print_uint32_bin(uint32_t val, uint32_t bits)
 static void print_int(int val)
 {
 	char buf[32];
-	int idx = 0;
-	if (val == 0) {
+	int idx;
+
+	idx = 0;
+	if (val == 0)
+	{
 		terminal_putchar('0');
 		return;
 	}
-	if (val < 0) {
+	if (val < 0)
+	{
 		terminal_putchar('-');
 		val = -val;
 	}
-	while (val > 0) {
+	while (val > 0)
+	{
 		buf[idx++] = (char)('0' + (val % 10));
 		val /= 10;
 	}
-	for (int i = idx - 1; i >= 0; i--) {
+	for (int i = idx - 1; i >= 0; i--)
 		terminal_putchar(buf[i]);
-	}
 }
 
-void printk(const char* fmt, ...) {
+void printk(const char* fmt, ...)
+{
 	va_list args;
 	va_start(args, fmt);
 
-	while (*fmt) {
-		if (*fmt == '%' && *(fmt+1) != '\0') {
+	while (*fmt)
+	{
+		if (*fmt == '%' && *(fmt+1) != '\0')
+		{
 			fmt++;
-			switch (*fmt) {
+			switch (*fmt)
+			{
 				case 's': {
 					const char* s = va_arg(args, const char*);
 					terminal_write(s);
@@ -95,9 +107,9 @@ void printk(const char* fmt, ...) {
 					terminal_putchar(*fmt);
 					break;
 			}
-		} else {
-			terminal_putchar(*fmt);
 		}
+		else
+			terminal_putchar(*fmt);
 		fmt++;
 	}
 
