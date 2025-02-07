@@ -62,7 +62,8 @@ void	terminal_write(const char* str)
 		terminal_putchar(str[i]);
 }
 
-void	terminal_initialize(void) {
+void	terminal_initialize(void)
+{
 	term.row	= 0;
 	term.col	= 0;
 	term.color	= LIGHT_GREY | BLACK << 4;
