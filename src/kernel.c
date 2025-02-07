@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "printk.h"
 #include "io.h"
+#include "cursor.h"
 
 # define NTERM 3
 static struct term terms[NTERM];
@@ -30,7 +31,7 @@ void switch_term(uint8_t term_idx) {
     cpy_term();
     cur_term = term_idx;
     paste_term(cur_term);
-    position_cursor(terms[cur_term].row, terms[cur_term].col);
+    set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
 }
 
 
@@ -75,7 +76,7 @@ void	terminal_putchar(char c)
 		terminal_newline();
 	if (c != '\n')
 		terminal_putchar_at(c, terms[cur_term].col++, terms[cur_term].row);
-	position_cursor(terms[cur_term].row, terms[cur_term].col);
+	set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
 }
 
 void	terminal_write(const char* str)
@@ -96,7 +97,8 @@ void	terminal_initialize(void)
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
-	position_cursor(terms[cur_term].row, terms[cur_term].col);
+    enable_cursor(14, 15); // default cursor
+	set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
 }
 
 void term_rainbow_write(const char* str) {
