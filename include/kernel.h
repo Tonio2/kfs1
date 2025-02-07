@@ -30,6 +30,7 @@ struct term {
 	uint32_t row;
 	uint32_t col;
 	uint8_t	 color;
+    uint8_t buf[VGA_WIDTH * VGA_HEIGHT];
 };
 
 void	terminal_putchar(char c);
