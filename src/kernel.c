@@ -4,11 +4,11 @@
 #include "cursor.h"
 #include "keycodes.h"
 
-# define NTERM 3
-static struct term terms[NTERM];
-static uint16_t * const	term_buffer = (uint16_t *)0xb8000;
-static struct term * term = &terms[0];
+# define NTERM 8
 
+static struct term		terms[NTERM];
+static struct term *	term = &terms[0];
+static uint16_t * const	term_buffer = (uint16_t *)0xb8000;
 
 /* ########################################################################## */
 
@@ -17,23 +17,24 @@ static uint16_t	vga_entry(char c)
 	return ((uint16_t)c | (uint16_t)term->color << 8);
 }
 
-void cpy_term(void) {
-    for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
-        term->buf[i] = term_buffer[i];
-    }
+void cpy_term(void)
+{
+	for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; ++i)
+		term->buf[i] = term_buffer[i];
 }
 
-void paste_term() {
-    for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
-        term_buffer[i] = term->buf[i];
-    }
+void paste_term()
+{
+	for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; ++i)
+		term_buffer[i] = term->buf[i];
 }
 
-void switch_term(uint8_t term_idx) {
-    cpy_term();
-    term = &terms[term_idx];
-    paste_term();
-    set_cursor_coord(term->row, term->col);
+void switch_term(uint8_t term_idx)
+{
+	cpy_term();
+	term = &terms[term_idx];
+	paste_term();
+	set_cursor_coord(term->row, term->col);
 }
 
 
@@ -76,7 +77,7 @@ void	terminal_cursor_move(uint8_t dir)
 				++term->col;
 			break;
 	}
-	position_cursor(term->row, term->col);
+	set_cursor_coord(term->row, term->col);
 }
 
 /* Scrolls the screen up by 1 line */
@@ -119,7 +120,7 @@ void	terminal_del(void)
 {
 	terminal_cursor_move(2);
 	terminal_putchar_at(' ', term->col, term->row);
-	position_cursor(term->row, term->col);
+	set_cursor_coord(term->row, term->col);
 }
 
 void	terminal_putchar(char c)
@@ -128,7 +129,7 @@ void	terminal_putchar(char c)
 		terminal_putchar_at(c, term->col++, term->row);
 	if (term->col >= VGA_WIDTH || c == '\n')
 		terminal_newline();
-	position_cursor(term->row, term->col);
+	set_cursor_coord(term->row, term->col);
 }
 
 void	terminal_write(const char* str)
@@ -139,41 +140,45 @@ void	terminal_write(const char* str)
 
 void	terminal_initialize(void)
 {
-    for (uint8_t i = 0; i < NTERM; i++) {
-        terms[i].row	= 0;
-        terms[i].col	= 0;
-        terms[i].color	= LIGHT_GREY | BLACK << 4;
+	for (uint8_t i = 0; i < NTERM; ++i)
+	{
+		terms[i].row	= 0;
+		terms[i].col	= 0;
+		terms[i].color	= LIGHT_GREY | BLACK << 4;
 		for (uint32_t j = 0; j < VGA_HEIGHT * VGA_WIDTH; j++)
 			terms[i].buf[j] = vga_entry(' ');
-    }
+	}
 
-    terms[1].color = RED | BLACK << 4;
+	/* So that all of the buffer is red */
+	terms[1].color = RED | BLACK << 4;
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
-    resize_cursor(14, 15); // default cursor
+	resize_cursor(14, 15); // default cursor
 	set_cursor_coord(term->row, term->col);
 }
 
-void term_rainbow_write(const char* str) {
-    static uint8_t colors[8] = {RED, LIGHT_RED, LIGHT_BROWN, LIGHT_GREEN, CYAN, LIGHT_BLUE, MAGENTA, WHITE};
+void term_rainbow_write(const char* str)
+{
+	static uint8_t colors[8] = {RED, LIGHT_RED, LIGHT_BROWN, LIGHT_GREEN, CYAN, LIGHT_BLUE, MAGENTA, WHITE};
 
-    for (uint32_t i = 0; str[i]; ++i) {
-        term->color = colors[term->col / 10];
-        terminal_putchar(str[i]);
-    }
+	for (uint32_t i = 0; str[i]; ++i)
+	{
+		term->color = colors[term->col / 10];
+		terminal_putchar(str[i]);
+	}
 }
 
-void welcome_msg() {
-
+void welcome_msg()
+{
 	term_rainbow_write("\n\n\n\n\n");
 	term_rainbow_write("               :::     ::::::::        :::    ::: ::::::::: ::::::::: \n");
-    term_rainbow_write("             :+:     :+:    :+:       :+:   :+:  :+:       :+:    :+: \n");
-    term_rainbow_write("           +:+ +:+        +:+        +:+  +:+   +:+       +:+         \n");
-    term_rainbow_write("         +#+  +:+      +#+          +#++:++    :#::+::#  +#++:++#++   \n");
-    term_rainbow_write("       +#+#+#+#+#+  +#+            +#+  +#+   +#+              +#+    \n");
-    term_rainbow_write("            #+#   #+#             #+#   #+#  #+#       #+#    #+#     \n");
-    term_rainbow_write("           ###  ##########       ###    ### ###        ########       \n");
+	term_rainbow_write("             :+:     :+:    :+:       :+:   :+:  :+:       :+:    :+: \n");
+	term_rainbow_write("           +:+ +:+        +:+        +:+  +:+   +:+       +:+         \n");
+	term_rainbow_write("         +#+  +:+      +#+          +#++:++    :#::+::#  +#++:++#++   \n");
+	term_rainbow_write("       +#+#+#+#+#+  +#+            +#+  +#+   +#+              +#+    \n");
+	term_rainbow_write("            #+#   #+#             #+#   #+#  #+#       #+#    #+#     \n");
+	term_rainbow_write("           ###  ##########       ###    ### ###        ########       \n");
 	term_rainbow_write("\n\n\n\n\n");
 	term_rainbow_write("                       KERNEL FROM SCRATCH (KFS)                      \n");
 	term_rainbow_write("                  Crafted with <3 by  pitriche & alabalet             \n");
@@ -186,21 +191,15 @@ void	kernel_main(void)
 	uint16_t in;
 
 	terminal_initialize();
-
 	welcome_msg();
-
 	switch_term(1);
-
-	for (int i =0; i<5; i++) {
+	for (int i = 0; i < 5; ++i)
 		printk("Hello, kernel World! %d\n", i);
-	}
-
 	switch_term(0);
-
 	switch_term(2);
 	printk("Hello, kernel World! %s\n", "coucouuuuu");
 	printk("Hello, kernel World!\n");
-
+	switch_term(0);
 	while (1)
 	{
 
@@ -259,14 +258,14 @@ void	kernel_main(void)
 				case enter:		terminal_putchar('\n'); break;
 				case space:		terminal_putchar(' '); break;
 
-				case f1:		terminal_putchar('@'); break;
-				case f2:		terminal_putchar('@'); break;
-				case f3:		terminal_putchar('@'); break;
-				case f4:		terminal_putchar('@'); break;
-				case f5:		terminal_putchar('@'); break;
-				case f6:		terminal_putchar('@'); break;
-				case f7:		terminal_putchar('@'); break;
-				case f8:		terminal_putchar('@'); break;
+				case f1:		switch_term(0); break;
+				case f2:		switch_term(1); break;
+				case f3:		switch_term(2); break;
+				case f4:		switch_term(3); break;
+				case f5:		switch_term(4); break;
+				case f6:		switch_term(5); break;
+				case f7:		switch_term(6); break;
+				case f8:		switch_term(7); break;
 
 				case extended:
 					switch ((in >> 8) & 0xff)
