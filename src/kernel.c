@@ -103,31 +103,25 @@ void term_rainbow_write(const char* str) {
     static uint8_t colors[8] = {RED, LIGHT_RED, LIGHT_BROWN, LIGHT_GREEN, CYAN, LIGHT_BLUE, MAGENTA, WHITE};
 
     for (uint32_t i = 0; str[i]; ++i) {
-        terms[cur_term].color = colors[terms[cur_term].col % 8];
+        terms[cur_term].color = colors[terms[cur_term].col / 10];
         terminal_putchar(str[i]);
     }
 }
 
 void welcome_msg() {
 
-	term_rainbow_write("   _____ ________                \n");
-	term_rainbow_write("  /  |  |\\_____  \\               \n");
-	term_rainbow_write(" /   |  |_/  ____/               \n");
-	term_rainbow_write("/    ^   /       \\               \n");
-	term_rainbow_write("\\____   |\\_______ \\              \n");
-	term_rainbow_write("     |__|        \\/              \n");
-	term_rainbow_write(" ____  __.____________________   \n");
-	term_rainbow_write("|    |/ _|\\_   _____/   _____/   \n");
-	term_rainbow_write("|      <   |    __) \\_____  \\    \n");
-	term_rainbow_write("|    |  \\  |     \\  /        \\   \n");
-	term_rainbow_write("|____|__ \\ \\___  / /_______  /   \n");
-	term_rainbow_write("        \\/     \\/          \\/    \n");
-	term_rainbow_write("__________    ____       _____   \n");
-	term_rainbow_write("\\______   \\  /  _ \\     /  _  \\  \n");
-	term_rainbow_write(" |     ___/  >  _ </\\  /  /_\\  \\ \n");
-	term_rainbow_write(" |    |     /  <_\\ \\/ /    |    \\\n");
-	term_rainbow_write(" |____|     \\_____\\ \\ \\____|__  /\n");
-	term_rainbow_write("                   \\/         \\/ \n");
+	term_rainbow_write("\n\n\n\n\n");
+	term_rainbow_write("               :::     ::::::::        :::    ::: ::::::::: ::::::::: \n");
+    term_rainbow_write("             :+:     :+:    :+:       :+:   :+:  :+:       :+:    :+: \n");
+    term_rainbow_write("           +:+ +:+        +:+        +:+  +:+   +:+       +:+         \n");
+    term_rainbow_write("         +#+  +:+      +#+          +#++:++    :#::+::#  +#++:++#++   \n");
+    term_rainbow_write("       +#+#+#+#+#+  +#+            +#+  +#+   +#+              +#+    \n");
+    term_rainbow_write("            #+#   #+#             #+#   #+#  #+#       #+#    #+#     \n");
+    term_rainbow_write("           ###  ##########       ###    ### ###        ########       \n");
+	term_rainbow_write("\n\n\n\n\n");
+	term_rainbow_write("                       KERNEL FROM SCRATCH (KFS)                      \n");
+	term_rainbow_write("                  Crafted with <3 by  pitriche & alabalet             \n");
+	term_rainbow_write("                             School 42                                \n");
 }
 
 
