@@ -4,6 +4,7 @@
 
 #define VGA_WIDTH	80
 #define VGA_HEIGHT	25
+#define DEBUG_ADDR	0x2000
 
 extern void	position_cursor(int row, int col);
 

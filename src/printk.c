@@ -12,7 +12,22 @@ static void print_uint32_hex(uint32_t val) {
 	terminal_write(buf);
 }
 
-static void print_int(int val) {
+/* UNPROTECTED ! no checks done to prevent bits from being the wrong size */
+static void print_uint32_bin(uint32_t val, uint32_t bits)
+{
+	char	buf[33];
+
+	buf[bits] = '\0';
+	for (int i = bits - 1; i >= 0; --i)
+	{
+		buf[i] = (val & 1) + '0';
+		val >>= 1;
+	}
+	terminal_write(buf);
+}
+
+static void print_int(int val)
+{
 	char buf[32];
 	int idx = 0;
 	if (val == 0) {
@@ -43,6 +58,21 @@ void printk(const char* fmt, ...) {
 				case 's': {
 					const char* s = va_arg(args, const char*);
 					terminal_write(s);
+					break;
+				}
+				case 'b': { /* 8 bits binary "byte" */
+					uint32_t val = va_arg(args, uint32_t);
+					print_uint32_bin(val, 8);
+					break;
+				}
+				case 'w': { /* 16 bits binary "word" */
+					uint32_t val = va_arg(args, uint32_t);
+					print_uint32_bin(val, 16);
+					break;
+				}
+				case 'i': { /* 32 bits binary "int" */
+					uint32_t val = va_arg(args, uint32_t);
+					print_uint32_bin(val, 32);
 					break;
 				}
 				case 'x': {

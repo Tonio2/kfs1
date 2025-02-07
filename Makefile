@@ -13,7 +13,7 @@ asm_obj :=		$(asm_src:$(src_path)%.s=$(asm_obj_path)%.o)
 # -fno-ident : Do not generate special symbols for debug information (remove the comment section)
 CFLAGS =		-m32 -c -ffreestanding -fno-builtin -fno-exceptions \
 				-fno-stack-protector -nostdlib -nodefaultlibs -fno-ident \
-				-I include -Wall -Wextra -Werror
+				-I include -Wall -Wextra
 
 LDFLAGS :=		-m elf_i386 -n -T src/linker.ld
 
@@ -28,7 +28,9 @@ DOCKER_RUN :=	docker run --rm -v "$(PWD):/root/cc" cross-compiler
 
 # ##############################################################################
 
-all : 
+all : $(kernel_iso)
+
+all_linux :
 	$(DOCKER_RUN) make $(kernel_iso)
 
 # create the bootable iso
@@ -53,7 +55,7 @@ $(c_obj_path)%.o : $(src_path)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(DOCKER_RUN) rm -rf $(obj_path)
+	rm -rf $(obj_path)
 
 fclean: clean
 	rm -rf $(kernel_iso) $(kernel_bin)
