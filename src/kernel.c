@@ -31,7 +31,7 @@ void paste_term() {
 void switch_term(uint8_t term_idx) {
     cpy_term();
     term = &terms[term_idx];
-    paste_term(term_idx);
+    paste_term();
     set_cursor_coord(term->row, term->col);
 }
 
