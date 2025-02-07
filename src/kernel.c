@@ -17,13 +17,13 @@ static uint16_t	vga_entry(char c)
 
 void cpy_term(void) {
     for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
-        terms[cur_term].buf[i] = term_buffer[i] & 0xFF;
+        terms[cur_term].buf[i] = term_buffer[i];
     }
 }
 
 void paste_term(uint8_t term_idx) {
     for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
-        term_buffer[i] = vga_entry(terms[term_idx].buf[i]);
+        term_buffer[i] = terms[term_idx].buf[i];
     }
 }
 
@@ -91,6 +91,8 @@ void	terminal_initialize(void)
         terms[i].row	= 0;
         terms[i].col	= 0;
         terms[i].color	= LIGHT_GREY | BLACK << 4;
+		for (uint32_t j = 0; j < VGA_HEIGHT * VGA_WIDTH; j++)
+			terms[i].buf[j] = vga_entry(' ');
     }
 
     terms[1].color = RED | BLACK << 4;
@@ -133,20 +135,13 @@ void	kernel_main(void)
 
 	welcome_msg();
 
-	// for (int i =0; i<5; i++) {
-	// 	printk("Hello, kernel World! %d\n", i);
-	// }
-	// printk("Hello, kernel World! %s\n", "coucouuuuu");
-	// printk("Hello, kernel World!");
-    // switch_term(1);
-    // printk("Hello\n");
-	// for (int i =0; i<5; i++) {
-	// 	printk("Hello, kernel World! %d\n", i);
-	// }
-    // printk("cursor_row : %d | cursor_col : %d | ", terms[cur_term].row, terms[cur_term].col);
-    // printk("cursor_col: %d", terms[cur_term].col);
-    // switch_term(0);
-    // switch_term(1);
+	switch_term(1);
 
+	for (int i =0; i<5; i++) {
+		printk("Hello, kernel World! %d\n", i);
+	}
 
+	switch_term(0);
+
+	switch_term(1);
 }
