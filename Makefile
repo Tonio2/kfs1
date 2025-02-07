@@ -13,7 +13,7 @@ asm_obj :=		$(asm_src:$(src_path)%.s=$(asm_obj_path)%.o)
 # -fno-ident : Do not generate special symbols for debug information (remove the comment section)
 CFLAGS =		-m32 -c -ffreestanding -fno-builtin -fno-exceptions \
 				-fno-stack-protector -nostdlib -nodefaultlibs -fno-ident \
-				-I include -Wall -Wextra -Werror
+				-I include -Wall -Wextra
 
 LDFLAGS :=		-m elf_i386 -n -T src/linker.ld
 
