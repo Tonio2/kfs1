@@ -6,32 +6,33 @@
 # define NTERM 3
 static struct term terms[NTERM];
 static uint16_t * const	term_buffer = (uint16_t *)0xb8000;
-static uint8_t cur_term = 0;
+static struct term * term = &terms[0];
+
 
 /* ########################################################################## */
 
 static uint16_t	vga_entry(char c)
 {
-	return ((uint16_t)c | (uint16_t)terms[cur_term].color << 8);
+	return ((uint16_t)c | (uint16_t)term->color << 8);
 }
 
 void cpy_term(void) {
     for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
-        terms[cur_term].buf[i] = term_buffer[i];
+        term->buf[i] = term_buffer[i];
     }
 }
 
-void paste_term(uint8_t term_idx) {
+void paste_term() {
     for (uint16_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
-        term_buffer[i] = terms[term_idx].buf[i];
+        term_buffer[i] = term->buf[i];
     }
 }
 
 void switch_term(uint8_t term_idx) {
     cpy_term();
-    cur_term = term_idx;
-    paste_term(cur_term);
-    set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
+    term = &terms[term_idx];
+    paste_term(term_idx);
+    set_cursor_coord(term->row, term->col);
 }
 
 
@@ -51,11 +52,11 @@ static void terminal_scroll(void)
 
 void	terminal_newline()
 {
-	terms[cur_term].col = 0;
-	if (terms[cur_term].row + 1 >= VGA_HEIGHT)
+	term->col = 0;
+	if (term->row + 1 >= VGA_HEIGHT)
 		terminal_scroll();
 	else
-		terms[cur_term].row++;
+		term->row++;
 }
 
 /* Clears the entire screen */
@@ -72,11 +73,11 @@ void	terminal_putchar_at(char c, uint32_t x, uint32_t y)
 
 void	terminal_putchar(char c)
 {
-	if (c == '\n' || terms[cur_term].col == VGA_WIDTH)
+	if (c == '\n' || term->col == VGA_WIDTH)
 		terminal_newline();
 	if (c != '\n')
-		terminal_putchar_at(c, terms[cur_term].col++, terms[cur_term].row);
-	set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
+		terminal_putchar_at(c, term->col++, term->row);
+	set_cursor_coord(term->row, term->col);
 }
 
 void	terminal_write(const char* str)
@@ -100,14 +101,14 @@ void	terminal_initialize(void)
 	/* Clear screen and set the cursor */
 	terminal_clear();
     resize_cursor(14, 15); // default cursor
-	set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
+	set_cursor_coord(term->row, term->col);
 }
 
 void term_rainbow_write(const char* str) {
     static uint8_t colors[8] = {RED, LIGHT_RED, LIGHT_BROWN, LIGHT_GREEN, CYAN, LIGHT_BLUE, MAGENTA, WHITE};
 
     for (uint32_t i = 0; str[i]; ++i) {
-        terms[cur_term].color = colors[terms[cur_term].col / 10];
+        term->color = colors[term->col / 10];
         terminal_putchar(str[i]);
     }
 }
