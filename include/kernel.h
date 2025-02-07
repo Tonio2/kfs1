@@ -6,8 +6,6 @@
 #define VGA_HEIGHT	25
 #define DEBUG_ADDR	0x2000
 
-extern void	position_cursor(int row, int col);
-
 enum vga_color {
 	BLACK = 0,
 	BLUE = 1,
