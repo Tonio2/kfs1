@@ -99,24 +99,58 @@ void	terminal_initialize(void)
 	position_cursor(terms[cur_term].row, terms[cur_term].col);
 }
 
+void term_rainbow_write(const char* str) {
+    static uint8_t colors[8] = {RED, LIGHT_RED, LIGHT_BROWN, LIGHT_GREEN, CYAN, LIGHT_BLUE, MAGENTA, WHITE};
+
+    for (uint32_t i = 0; str[i]; ++i) {
+        terms[cur_term].color = colors[terms[cur_term].col % 8];
+        terminal_putchar(str[i]);
+    }
+}
+
+void welcome_msg() {
+
+	term_rainbow_write("   _____ ________                \n");
+	term_rainbow_write("  /  |  |\\_____  \\               \n");
+	term_rainbow_write(" /   |  |_/  ____/               \n");
+	term_rainbow_write("/    ^   /       \\               \n");
+	term_rainbow_write("\\____   |\\_______ \\              \n");
+	term_rainbow_write("     |__|        \\/              \n");
+	term_rainbow_write(" ____  __.____________________   \n");
+	term_rainbow_write("|    |/ _|\\_   _____/   _____/   \n");
+	term_rainbow_write("|      <   |    __) \\_____  \\    \n");
+	term_rainbow_write("|    |  \\  |     \\  /        \\   \n");
+	term_rainbow_write("|____|__ \\ \\___  / /_______  /   \n");
+	term_rainbow_write("        \\/     \\/          \\/    \n");
+	term_rainbow_write("__________    ____       _____   \n");
+	term_rainbow_write("\\______   \\  /  _ \\     /  _  \\  \n");
+	term_rainbow_write(" |     ___/  >  _ </\\  /  /_\\  \\ \n");
+	term_rainbow_write(" |    |     /  <_\\ \\/ /    |    \\\n");
+	term_rainbow_write(" |____|     \\_____\\ \\ \\____|__  /\n");
+	term_rainbow_write("                   \\/         \\/ \n");
+}
+
+
 void	kernel_main(void)
 {
 	terminal_initialize();
 
-	for (int i =0; i<5; i++) {
-		printk("Hello, kernel World! %d\n", i);
-	}
-	printk("Hello, kernel World! %s\n", "coucouuuuu");
-	printk("Hello, kernel World!");
-    switch_term(1);
-    printk("Hello\n");
-	for (int i =0; i<5; i++) {
-		printk("Hello, kernel World! %d\n", i);
-	}
-    printk("cursor_row : %d | cursor_col : %d | ", terms[cur_term].row, terms[cur_term].col);
-    printk("cursor_col: %d", terms[cur_term].col);
-    switch_term(0);
-    switch_term(1);
+	welcome_msg();
+
+	// for (int i =0; i<5; i++) {
+	// 	printk("Hello, kernel World! %d\n", i);
+	// }
+	// printk("Hello, kernel World! %s\n", "coucouuuuu");
+	// printk("Hello, kernel World!");
+    // switch_term(1);
+    // printk("Hello\n");
+	// for (int i =0; i<5; i++) {
+	// 	printk("Hello, kernel World! %d\n", i);
+	// }
+    // printk("cursor_row : %d | cursor_col : %d | ", terms[cur_term].row, terms[cur_term].col);
+    // printk("cursor_col: %d", terms[cur_term].col);
+    // switch_term(0);
+    // switch_term(1);
 
 
 }
