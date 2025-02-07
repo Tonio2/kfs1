@@ -1,5 +1,6 @@
 #include "cursor.h"
 #include "kernel.h"
+#include "io.h"
 
 void resize_cursor(uint8_t start, uint8_t end) {
 	out8(0x3D4, 0x0A);

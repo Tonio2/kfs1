@@ -97,7 +97,7 @@ void	terminal_initialize(void)
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
-    enable_cursor(14, 15); // default cursor
+    resize_cursor(14, 15); // default cursor
 	set_cursor_coord(terms[cur_term].row, terms[cur_term].col);
 }
 
