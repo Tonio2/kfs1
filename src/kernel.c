@@ -123,13 +123,18 @@ void	terminal_del(void)
 	set_cursor_coord(term->row, term->col);
 }
 
-void	terminal_putchar(char c)
+void term_putchar_color(char c, uint8_t color)
 {
 	if (c != '\n')
 		terminal_putchar_at(c, term->col++, term->row);
 	if (term->col >= VGA_WIDTH || c == '\n')
 		terminal_newline();
 	set_cursor_coord(term->row, term->col);
+}
+
+void	terminal_putchar(char c)
+{
+	term_putchar_color(c, term->color);
 }
 
 void	terminal_write(const char* str)
@@ -164,8 +169,7 @@ void term_rainbow_write(const char* str)
 
 	for (uint32_t i = 0; str[i]; ++i)
 	{
-		term->color = colors[term->col / 10];
-		terminal_putchar(str[i]);
+		term_putchar_color(str[i], colors[term->col / 10]);
 	}
 }
 
