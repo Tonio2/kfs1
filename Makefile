@@ -24,13 +24,17 @@ CC :=			x86_64-elf-gcc
 LD :=			x86_64-elf-ld
 NASM :=			nasm
 
-DOCKER_RUN :=	docker run --rm -v "$(PWD):/root/cc" cross-compiler
+ifeq ($(OS), Windows_NT)
+	HOST_NAME := $(shell pwd -W)
+else
+	HOST_NAME := $(PWD)
+endif
+
+DOCKER_RUN :=	docker run --rm -v "$(HOST_NAME):/root/cc" cross-compiler
 
 # ##############################################################################
 
-all : $(kernel_iso)
-
-all_linux :
+all :
 	$(DOCKER_RUN) make $(kernel_iso)
 
 # create the bootable iso
@@ -38,7 +42,7 @@ $(kernel_iso): $(kernel_bin)
 	grub-mkrescue -o $(kernel_iso) --compress=xz iso
 
 # compile the kernel
-$(kernel_bin): $(obj_path) $(c_obj) $(asm_obj) 
+$(kernel_bin): $(obj_path) $(c_obj) $(asm_obj)
 	$(LD) $(LDFLAGS) -o $(kernel_bin) $(asm_obj) $(c_obj)
 
 # create build directory
@@ -55,7 +59,7 @@ $(c_obj_path)%.o : $(src_path)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(obj_path)
+	$(DOCKER_RUN) rm -rf $(obj_path)
 
 fclean: clean
 	rm -rf $(kernel_iso) $(kernel_bin)
