@@ -55,3 +55,12 @@ enum keycode_ext
 	up = 0x48,
 	down = 0x50,
 };
+
+const char keycodes[] = {
+	[a] = 'a', [b] = 'b', [c] = 'c', [d] = 'd', [e] = 'e', [f] = 'f', [g] = 'g',
+	[h] = 'h', [i] = 'i', [j] = 'j', [k] = 'k', [l] = 'l', [m] = 'm', [n] = 'n',
+	[o] = 'o', [p] = 'p', [q] = 'q', [r] = 'r', [s] = 's', [t] = 't', [u] = 'u',
+	[v] = 'v', [w] = 'w', [x] = 'x', [y] = 'y', [z] = 'z',
+	[one] = '1', [one + 1] = '2', [one + 2] = '3', [one + 3] = '4', [one + 4] = '5', [one + 5] = '6', [one + 6] = '7', [one + 7] = '8', [one + 8] = '9', [one + 9] = '0',
+	[dash] = '-', [equal] = '=', [space] = ' ', [enter] = '\n',
+};

@@ -120,7 +120,6 @@ void	terminal_del(void)
 {
 	terminal_cursor_move(2);
 	terminal_putchar_at(' ', term->col, term->row);
-	set_cursor_coord(term->row, term->col);
 }
 
 void	terminal_putchar(char c)
@@ -210,53 +209,10 @@ void	kernel_main(void)
 		if (in8(0x64) & 1)
 		{
 			in = in16(0x60);
-			// printk("keypress [0x%x]-", in);
-			// printk("keypress [0x%x]  ", in & 0xff);
 			switch (in & 0xff)
 			{
-				case a:			terminal_putchar('a'); break;
-				case b:			terminal_putchar('b'); break;
-				case c:			terminal_putchar('c'); break;
-				case d:			terminal_putchar('d'); break;
-				case e:			terminal_putchar('e'); break;
-				case f:			terminal_putchar('f'); break;
-				case g:			terminal_putchar('g'); break;
-				case h:			terminal_putchar('h'); break;
-				case i:			terminal_putchar('i'); break;
-				case j:			terminal_putchar('j'); break;
-				case k:			terminal_putchar('k'); break;
-				case l:			terminal_putchar('l'); break;
-				case m:			terminal_putchar('m'); break;
-				case n:			terminal_putchar('n'); break;
-				case o:			terminal_putchar('o'); break;
-				case p:			terminal_putchar('p'); break;
-				case q:			terminal_putchar('q'); break;
-				case r:			terminal_putchar('r'); break;
-				case s:			terminal_putchar('s'); break;
-				case t:			terminal_putchar('t'); break;
-				case u:			terminal_putchar('u'); break;
-				case v:			terminal_putchar('v'); break;
-				case w:			terminal_putchar('w'); break;
-				case x:			terminal_putchar('x'); break;
-				case y:			terminal_putchar('y'); break;
-				case z:			terminal_putchar('z'); break;
 
-				case one:		terminal_putchar('1'); break;
-				case one + 1:	terminal_putchar('2'); break;	/* je suis désolé.. */
-				case one + 2:	terminal_putchar('3'); break;
-				case one + 3:	terminal_putchar('4'); break;
-				case one + 4:	terminal_putchar('5'); break;
-				case one + 5:	terminal_putchar('6'); break;
-				case one + 6:	terminal_putchar('7'); break;
-				case one + 7:	terminal_putchar('8'); break;
-				case one + 8:	terminal_putchar('9'); break;
-				case zero:		terminal_putchar('0'); break;
-
-				case dash:		terminal_putchar('-'); break;
-				case equal:		terminal_putchar('='); break;
 				case del:		terminal_del(); break;
-				case enter:		terminal_putchar('\n'); break;
-				case space:		terminal_putchar(' '); break;
 
 				case f1:		switch_term(0); break;
 				case f2:		switch_term(1); break;
@@ -275,7 +231,11 @@ void	kernel_main(void)
 						case left:	terminal_cursor_move(2); break;
 						case right:	terminal_cursor_move(3); break;
 					}
-				break;
+					break;
+				default:
+					if ( (in & 0xff) < sizeof(keycodes) && keycodes[in & 0xff])
+						terminal_putchar(keycodes[in & 0xff]);
+					break;
 
 				// case esc: asm("hlt"); break;
 			}
