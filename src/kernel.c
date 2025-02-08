@@ -8,7 +8,7 @@
 
 static struct term		terms[NTERM];
 static struct term *	term = &terms[0];
-static uint16_t * const	term_buffer = (uint16_t *)0xb8000;
+static uint16_t * const	term_buffer = (uint16_t *)VGA_BUF_ADDR;
 
 /* ########################################################################## */
 
@@ -211,9 +211,9 @@ void	kernel_main(void)
 		 * Serial port 0x64 (status register) polling to wait for bit 1
 		 * (output buffer full)
 		 */
-		if (in8(0x64) & 1)
+		if (in8(KEYBOARD_STATUS_PORT) & 1)
 		{
-			in = in16(0x60);
+			in = in16(KEYBOARD_DATA_PORT);
 			// printk("keypress [0x%x]-", in);
 			// printk("keypress [0x%x]  ", in & 0xff);
 			switch (in & 0xff)
