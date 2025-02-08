@@ -120,7 +120,6 @@ void	terminal_del(void)
 {
 	terminal_cursor_move(2);
 	terminal_putchar_at(' ', term->col, term->row);
-	set_cursor_coord(term->row, term->col);
 }
 
 void	terminal_putchar(char c)
