@@ -5,6 +5,10 @@
 #define VGA_WIDTH	80
 #define VGA_HEIGHT	25
 #define DEBUG_ADDR	0x2000
+#define VGA_BUF_ADDR 0xb8000
+#define KEYBOARD_STATUS_PORT 0x64
+#define KEYBOARD_DATA_PORT 0x60
+
 
 enum vga_color {
 	BLACK = 0,
