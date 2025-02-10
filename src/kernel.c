@@ -9,6 +9,7 @@
 static struct term		terms[NTERM];
 static struct term *	term = &terms[0];
 static uint16_t * const	term_buffer = (uint16_t *)VGA_BUF_ADDR;
+static char				kp_char[128];
 
 /* ########################################################################## */
 
@@ -123,18 +124,13 @@ void	terminal_del(void)
 	set_cursor_coord(term->row, term->col);
 }
 
-void term_putchar_color(char c, uint8_t color)
+void	terminal_putchar(char c)
 {
 	if (c != '\n')
 		terminal_putchar_at(c, term->col++, term->row);
 	if (term->col >= VGA_WIDTH || c == '\n')
 		terminal_newline();
 	set_cursor_coord(term->row, term->col);
-}
-
-void	terminal_putchar(char c)
-{
-	term_putchar_color(c, term->color);
 }
 
 void	terminal_write(const char* str)
@@ -169,11 +165,33 @@ void term_rainbow_write(const char* str)
 
 	for (uint32_t i = 0; str[i]; ++i)
 	{
-		term_putchar_color(str[i], colors[term->col / 10]);
+		term->color = colors[term->col / 10];
+		terminal_putchar(str[i]);
 	}
 }
 
-void welcome_msg()
+void	keyboard_initialize()
+{
+	for (int i = 0; i < 128; ++i)
+		kp_char[i] = 0;
+	kp_char[a] = 'a'; kp_char[b] = 'b'; kp_char[c] = 'c'; kp_char[d] = 'd';
+	kp_char[e] = 'e'; kp_char[f] = 'f'; kp_char[g] = 'g'; kp_char[h] = 'h';
+	kp_char[i] = 'i'; kp_char[j] = 'j'; kp_char[k] = 'k'; kp_char[l] = 'l';
+	kp_char[m] = 'm'; kp_char[n] = 'n'; kp_char[o] = 'o'; kp_char[p] = 'p';
+	kp_char[q] = 'q'; kp_char[r] = 'r'; kp_char[s] = 's'; kp_char[t] = 't';
+	kp_char[u] = 'u'; kp_char[v] = 'v'; kp_char[w] = 'w'; kp_char[x] = 'x';
+	kp_char[y] = 'y'; kp_char[z] = 'z';
+	
+	kp_char[zero] = '0'; kp_char[one] = '1'; kp_char[one + 1] = '2';
+	kp_char[one + 2] = '3'; kp_char[one + 3] = '4'; kp_char[one + 4] = '5';
+	kp_char[one + 5] = '6'; kp_char[one + 6] = '7'; kp_char[one + 7] = '8';
+	kp_char[one + 8] = '9';
+
+	kp_char[dash] = '-'; kp_char[equal] = '='; kp_char[enter] = '\n';
+	kp_char[space] = ' ';
+}
+
+void	welcome_msg()
 {
 	term_rainbow_write("\n\n\n\n\n");
 	term_rainbow_write("               :::     ::::::::        :::    ::: ::::::::: ::::::::: \n");
@@ -189,12 +207,12 @@ void welcome_msg()
 	term_rainbow_write("                             School 42                                \n");
 }
 
-
 void	kernel_main(void)
 {
 	uint16_t in;
 
 	terminal_initialize();
+	keyboard_initialize();
 	welcome_msg();
 	switch_term(1);
 	for (int i = 0; i < 5; ++i)
@@ -216,51 +234,15 @@ void	kernel_main(void)
 			in = in16(KEYBOARD_DATA_PORT);
 			// printk("keypress [0x%x]-", in);
 			// printk("keypress [0x%x]  ", in & 0xff);
+
+			/* print characters if keypress is mapped */
+			if (!(in & 0b10000000) && kp_char[in & 0b01111111])
+				terminal_putchar(kp_char[in & 0x7f]);
+
+			/* special function key */
 			switch (in & 0xff)
 			{
-				case a:			terminal_putchar('a'); break;
-				case b:			terminal_putchar('b'); break;
-				case c:			terminal_putchar('c'); break;
-				case d:			terminal_putchar('d'); break;
-				case e:			terminal_putchar('e'); break;
-				case f:			terminal_putchar('f'); break;
-				case g:			terminal_putchar('g'); break;
-				case h:			terminal_putchar('h'); break;
-				case i:			terminal_putchar('i'); break;
-				case j:			terminal_putchar('j'); break;
-				case k:			terminal_putchar('k'); break;
-				case l:			terminal_putchar('l'); break;
-				case m:			terminal_putchar('m'); break;
-				case n:			terminal_putchar('n'); break;
-				case o:			terminal_putchar('o'); break;
-				case p:			terminal_putchar('p'); break;
-				case q:			terminal_putchar('q'); break;
-				case r:			terminal_putchar('r'); break;
-				case s:			terminal_putchar('s'); break;
-				case t:			terminal_putchar('t'); break;
-				case u:			terminal_putchar('u'); break;
-				case v:			terminal_putchar('v'); break;
-				case w:			terminal_putchar('w'); break;
-				case x:			terminal_putchar('x'); break;
-				case y:			terminal_putchar('y'); break;
-				case z:			terminal_putchar('z'); break;
-
-				case one:		terminal_putchar('1'); break;
-				case one + 1:	terminal_putchar('2'); break;	/* je suis désolé.. */
-				case one + 2:	terminal_putchar('3'); break;
-				case one + 3:	terminal_putchar('4'); break;
-				case one + 4:	terminal_putchar('5'); break;
-				case one + 5:	terminal_putchar('6'); break;
-				case one + 6:	terminal_putchar('7'); break;
-				case one + 7:	terminal_putchar('8'); break;
-				case one + 8:	terminal_putchar('9'); break;
-				case zero:		terminal_putchar('0'); break;
-
-				case dash:		terminal_putchar('-'); break;
-				case equal:		terminal_putchar('='); break;
 				case del:		terminal_del(); break;
-				case enter:		terminal_putchar('\n'); break;
-				case space:		terminal_putchar(' '); break;
 
 				case f1:		switch_term(0); break;
 				case f2:		switch_term(1); break;
