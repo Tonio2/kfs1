@@ -123,7 +123,7 @@ void	terminal_del(void)
 	set_cursor_coord(term->row, term->col);
 }
 
-void term_putchar_color(char c, uint8_t color)
+void term_putchar_color(char c)
 {
 	if (c != '\n')
 		terminal_putchar_at(c, term->col++, term->row);
@@ -134,7 +134,7 @@ void term_putchar_color(char c, uint8_t color)
 
 void	terminal_putchar(char c)
 {
-	term_putchar_color(c, term->color);
+	term_putchar_color(c);
 }
 
 void	terminal_write(const char* str)
@@ -169,7 +169,8 @@ void term_rainbow_write(const char* str)
 
 	for (uint32_t i = 0; str[i]; ++i)
 	{
-		term_putchar_color(str[i], colors[term->col / 10]);
+		term->color = colors[term->col / 10] | BLACK << 4;
+		term_putchar_color(str[i]);
 	}
 }
 
@@ -189,6 +190,10 @@ void welcome_msg()
 	term_rainbow_write("                             School 42                                \n");
 }
 
+extern void get_gdt(uint32_t *gdt_address, uint16_t *gdt_size);
+extern void get_pe(uint32_t *pe);
+
+
 
 void	kernel_main(void)
 {
@@ -196,14 +201,25 @@ void	kernel_main(void)
 
 	terminal_initialize();
 	welcome_msg();
-	switch_term(1);
-	for (int i = 0; i < 5; ++i)
-		printk("Hello, kernel World! %d\n", i);
-	switch_term(0);
-	switch_term(2);
-	printk("Hello, kernel World! %s\n", "coucouuuuu");
-	printk("Hello, kernel World!\n");
-	switch_term(0);
+	uint32_t gdt_adress;
+	uint16_t gdt_size;
+
+	get_gdt(&gdt_adress, &gdt_size);
+
+	printk("Welcome to the kernel\n");
+	printk("GDT address: 0x%x\n", gdt_adress);
+	printk("GDT size: %d\n", gdt_size);
+
+	uint32_t *gdt = (uint32_t *)gdt_adress;
+	for (uint16_t i = 0; i < (gdt_size + 1) / 8; i++) // Une entrée GDT fait 8 octets
+	{
+		printk("GDT[%d]: 0x%x\n", i, gdt[i]);
+	}
+
+	uint32_t pe;
+	get_pe(&pe);
+	printk("PE: 0b%i\n", pe);
+
 	while (1)
 	{
 
