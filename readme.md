@@ -29,7 +29,7 @@ docker run --rm -it -v "$(pwd):/root/cc" cross_compiler_env
 Once inside the container, simply run make to compile the project.
 
 
-## Running MyOS
+## Running KFS1
 
 Don't forget to add qemu folder to the path !
 
@@ -42,7 +42,11 @@ qemu-system-i386 -cdrom .\kernel.iso
 
 - [`src`](src/): Contains the source code for the kernel
     - [`boot.s`](src/boot.s): Assembly code for the bootloader
+    - [`header.s`](src/header.s): Assembly code for the multiboot header
+    - [`io.s`](src/io.s): Assembly code for port I/O functions
     - [`kernel.c`](src/kernel.c): C code for the kernel
+    - [`printk.c`](src/printk.c): C code for printk function
+    - [`cursor.c`](src/cursor.c): C code for cursor resize and repositioning
     - [`linker.ld`](src/linker.ld): Linker script for the kernel
 - [`Makefile`](Makefile): Build script for the project
 - [`grub.cfg`](grub.cfg): GRUB configuration file for booting the kernel
