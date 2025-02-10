@@ -3,6 +3,7 @@
 #include "io.h"
 #include "cursor.h"
 #include "keycodes.h"
+#include "gdt.h"
 
 # define NTERM 8
 
@@ -181,7 +182,7 @@ void	keyboard_initialize()
 	kp_char[q] = 'q'; kp_char[r] = 'r'; kp_char[s] = 's'; kp_char[t] = 't';
 	kp_char[u] = 'u'; kp_char[v] = 'v'; kp_char[w] = 'w'; kp_char[x] = 'x';
 	kp_char[y] = 'y'; kp_char[z] = 'z';
-	
+
 	kp_char[zero] = '0'; kp_char[one] = '1'; kp_char[one + 1] = '2';
 	kp_char[one + 2] = '3'; kp_char[one + 3] = '4'; kp_char[one + 4] = '5';
 	kp_char[one + 5] = '6'; kp_char[one + 6] = '7'; kp_char[one + 7] = '8';
@@ -214,14 +215,26 @@ void	kernel_main(void)
 	terminal_initialize();
 	keyboard_initialize();
 	welcome_msg();
-	switch_term(1);
-	for (int i = 0; i < 5; ++i)
-		printk("Hello, kernel World! %d\n", i);
-	switch_term(0);
-	switch_term(2);
-	printk("Hello, kernel World! %s\n", "coucouuuuu");
-	printk("Hello, kernel World!\n");
-	switch_term(0);
+	create_gdt();
+
+	// uint32_t gdt_adress;
+	// uint16_t gdt_size;
+
+	// get_gdt(&gdt_adress, &gdt_size);
+
+	// printk("Welcome to the kernel\n");
+	// printk("GDT address: 0x%x\n", gdt_adress);
+	// printk("GDT size: %d\n", gdt_size);
+
+	// uint32_t *gdt = (uint32_t *)gdt_adress;
+	// for (uint16_t i = 0; i < (gdt_size + 1) / 8; i++) // Une entrée GDT fait 8 octets
+	// {
+	// 	printk("GDT[%d]: 0x%x\n", i, gdt[i]);
+	// }
+
+	// uint32_t pe;
+	// get_pe(&pe);
+	// printk("PE: 0b%i\n", pe);
 	while (1)
 	{
 
