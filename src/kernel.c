@@ -236,7 +236,7 @@ void	kernel_main(void)
 			// printk("keypress [0x%x]  ", in & 0xff);
 
 			/* print characters if keypress is mapped */
-			if (kp_char[in & 0x7f])
+			if (!(in & 0b10000000) && kp_char[in & 0b01111111])
 				terminal_putchar(kp_char[in & 0x7f]);
 
 			/* special function key */
