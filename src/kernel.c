@@ -3,6 +3,7 @@
 #include "io.h"
 #include "cursor.h"
 #include "keycodes.h"
+#include "gdt.h"
 
 # define NTERM 8
 
@@ -150,8 +151,8 @@ void	terminal_initialize(void)
 			terms[i].buf[j] = vga_entry(' ');
 	}
 
-	/* So that all of the buffer is red */
-	terms[1].color = RED | BLACK << 4;
+	/* Example of color change in a terminal */
+	// terms[1].color = RED | BLACK << 4;
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
@@ -181,7 +182,7 @@ void	keyboard_initialize()
 	kp_char[q] = 'q'; kp_char[r] = 'r'; kp_char[s] = 's'; kp_char[t] = 't';
 	kp_char[u] = 'u'; kp_char[v] = 'v'; kp_char[w] = 'w'; kp_char[x] = 'x';
 	kp_char[y] = 'y'; kp_char[z] = 'z';
-	
+
 	kp_char[zero] = '0'; kp_char[one] = '1'; kp_char[one + 1] = '2';
 	kp_char[one + 2] = '3'; kp_char[one + 3] = '4'; kp_char[one + 4] = '5';
 	kp_char[one + 5] = '6'; kp_char[one + 6] = '7'; kp_char[one + 7] = '8';
@@ -209,19 +210,29 @@ void	welcome_msg()
 
 void	kernel_main(void)
 {
-	uint16_t in;
+	uint16_t				in;
+	uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
+	struct gdt_descriptor	gdtd;
 
+	init_gdt();
 	terminal_initialize();
 	keyboard_initialize();
 	welcome_msg();
+
+// ----- potentiellement a mettre dans une fonction
 	switch_term(1);
-	for (int i = 0; i < 5; ++i)
-		printk("Hello, kernel World! %d\n", i);
+	printk("Welcome to the kernel\n");
+	get_gdtd(&gdtd);
+	printk("GDT address: 0x%x\n", gdtd.base);
+	printk("GDT size: %d\n", gdtd.limit);
+
+	gdt_seg = (uint32_t *)gdtd.base;
+	for (uint16_t i = 0; i < (gdtd.limit + 1); i += 8) // Une entrée GDT fait 8 octets (2)
+		printk("GDT[%d]: 0x%x%x\n", i / 8, gdt_seg[i / 4], gdt_seg[i / 4 + 1]);
+	printk("eflags register: 0b%i\n", get_eflags());
 	switch_term(0);
-	switch_term(2);
-	printk("Hello, kernel World! %s\n", "coucouuuuu");
-	printk("Hello, kernel World!\n");
-	switch_term(0);
+// -----
+
 	while (1)
 	{
 
