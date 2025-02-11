@@ -17,12 +17,6 @@ load_gdt:
 	mov edx, [eax]
 	mov dword[0x2000], edx
 
-	;ret
-
-	mov eax, cr0
-	or al, 1
-	mov cr0, eax
-
 	jmp 0x08:.update_cs
 .update_cs:
 	mov ax, 0x10
@@ -33,10 +27,15 @@ load_gdt:
 	mov ax, 0x18
 	mov ss, ax
 
-	sti
+	mov eax, cr0
+	or al, 1
+	mov cr0, eax
+
+	; TODO: pk pas passer en mode protégé
+
+
 	ret
 
-	; TODO: passer en mode protégé
 
 get_gdt:
 	push ebp

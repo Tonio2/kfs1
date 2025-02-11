@@ -212,29 +212,31 @@ void	kernel_main(void)
 {
 	uint16_t in;
 
+	create_gdt();
 	terminal_initialize();
 	keyboard_initialize();
 	welcome_msg();
-	create_gdt();
 
-	// uint32_t gdt_adress;
-	// uint16_t gdt_size;
 
-	// get_gdt(&gdt_adress, &gdt_size);
+	uint32_t gdt_adress;
+	uint16_t gdt_size;
 
-	// printk("Welcome to the kernel\n");
-	// printk("GDT address: 0x%x\n", gdt_adress);
-	// printk("GDT size: %d\n", gdt_size);
+	get_gdt(&gdt_adress, &gdt_size);
 
-	// uint32_t *gdt = (uint32_t *)gdt_adress;
-	// for (uint16_t i = 0; i < (gdt_size + 1) / 8; i++) // Une entrée GDT fait 8 octets
-	// {
-	// 	printk("GDT[%d]: 0x%x\n", i, gdt[i]);
-	// }
+	printk("Welcome to the kernel\n");
+	printk("GDT address: 0x%x\n", gdt_adress);
+	printk("GDT size: %d\n", gdt_size);
 
-	// uint32_t pe;
-	// get_pe(&pe);
-	// printk("PE: 0b%i\n", pe);
+	uint32_t *gdt = (uint32_t *)gdt_adress;
+	for (uint16_t i = 0; i < (gdt_size + 1) / 4; i+=2) // Une entrée GDT fait 8 octets
+	{
+		printk("GDT[%d]: 0x%x%x\n", i / 2, gdt[i], gdt[i+1]);
+	}
+
+	uint32_t pe;
+	get_pe(&pe);
+	printk("PE: 0b%i\n", pe);
+
 	while (1)
 	{
 
