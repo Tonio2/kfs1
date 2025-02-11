@@ -9,9 +9,9 @@
 #define USER_RING	0b11110000
 
 /* 4 bits + E + DC + RW + A */
-#define DATA		0b00000110
-#define CODE		0b00001010
-#define STACK		0b00000010
+#define DATA		0b00000111
+#define CODE		0b00001011
+#define STACK		0b00000111
 
 
 
@@ -27,8 +27,8 @@ struct __attribute__((packed)) gdt_segment
 
 struct __attribute__((packed)) gdt_descriptor
 {
-	uint32_t	base;	/* GDTR -> GDT Descriptor */
 	uint16_t	limit;
+	uint32_t	base;	/* GDTR -> GDT Descriptor */
 };
 
 struct gdt

@@ -2,6 +2,11 @@ ENTRY(start)
 
 SECTIONS
 {
+
+	.gdt_section 0x800 : {
+         KEEP(*(.gdt_section))
+    }
+
     . = 1M;
 
     /* Multiboot header must appear in the first 8KiB. Keep it here at the front. */
