@@ -212,31 +212,24 @@ void welcome_msg()
 }
 
 void display_gdt() {
-	uint32_t gdt_adress;
-	uint16_t gdt_size;
+	uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
+	struct gdt_descriptor	gdtd;
 
-	get_gdt(&gdt_adress, &gdt_size);
 
 	printk("Welcome to the kernel\n");
-	printk("GDT address: 0x%x\n", gdt_adress);
-	printk("GDT size: %d\n", gdt_size);
+	get_gdtd(&gdtd);
+	printk("GDT address: 0x%x\n", gdtd.base);
+	printk("GDT size: %d\n", gdtd.limit);
 
-	uint32_t *gdt = (uint32_t *)gdt_adress;
-	for (uint16_t i = 0; i < (gdt_size + 1) / 4; i += 2) // Une entrée GDT fait 8 octets
-	{
-		printk("GDT[%d]: 0x%x%x\n", i / 2, gdt[i], gdt[i + 1]);
-	}
-
-	uint32_t pe;
-	get_pe(&pe);
-	printk("PE: 0b%i\n", pe);
+	gdt_seg = (uint32_t *)gdtd.base;
+	for (uint16_t i = 0; i < (gdtd.limit + 1); i += 8) // Une entrée GDT fait 8 octets (2)
+		printk("GDT[%d]: 0x%x%x\n", i / 8, gdt_seg[i / 4], gdt_seg[i / 4 + 1]);
+	printk("eflags register: 0b%i\n", get_eflags());
 }
 
 void kernel_main(void)
 {
 	uint16_t				in;
-	// uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
-	// struct gdt_descriptor	gdtd;
 
 
 	init_gdt();
@@ -245,19 +238,6 @@ void kernel_main(void)
 	welcome_msg();
 
 	display_gdt();
-
-
-  // switch_term(1);
-	// printk("Welcome to the kernel\n");
-	// get_gdtd(&gdtd);
-	// printk("GDT address: 0x%x\n", gdtd.base);
-	// printk("GDT size: %d\n", gdtd.limit);
-
-	// gdt_seg = (uint32_t *)gdtd.base;
-	// for (uint16_t i = 0; i < (gdtd.limit + 1); i += 8) // Une entrée GDT fait 8 octets (2)
-	// 	printk("GDT[%d]: 0x%x%x\n", i / 8, gdt_seg[i / 4], gdt_seg[i / 4 + 1]);
-	// printk("eflags register: 0b%i\n", get_eflags());
-	// switch_term(0);
 
 	while (1)
 	{

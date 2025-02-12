@@ -9,61 +9,6 @@ extern kernel_main
 
 section .text
 
-load_gdt:
-	cli
-	mov eax, [esp + 4]
-	lgdt [eax]
-
-	mov edx, [eax]
-	mov dword[0x2000], edx
-
-	jmp 0x08:.update_cs
-.update_cs:
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ax, 0x18
-	mov ss, ax
-
-	mov eax, cr0
-	or al, 1
-	mov cr0, eax
-
-	; TODO: pk pas passer en mode protégé
-
-
-	ret
-
-
-get_gdt:
-	push ebp
-	mov ebp, esp
-
-	sgdt [gdt_info]
-	mov eax, [ebp + 8]
-	mov ebx, [ebp + 12]
-
-	mov ecx, [gdt_info + 2]
-	mov edx, [gdt_info]
-
-	mov [eax], ecx
-	mov [ebx], edx
-
-	pop ebp
-	ret
-
-get_pe:
-	push ebp
-	mov ebp, esp
-
-	mov eax, cr0
-	mov [ebp + 8], eax
-
-	pop ebp
-	ret
-
 start:
 	mov esp, stack_top
 	call kernel_main
