@@ -235,15 +235,7 @@ void welcome_msg()
 	term_rainbow_write("                             School 42                                \n");
 }
 
-void kernel_main(void)
-{
-	uint16_t in;
-
-	create_gdt();
-	terminal_initialize();
-	keyboard_initialize();
-	welcome_msg();
-
+void display_gdt() {
 	uint32_t gdt_adress;
 	uint16_t gdt_size;
 
@@ -262,6 +254,18 @@ void kernel_main(void)
 	uint32_t pe;
 	get_pe(&pe);
 	printk("PE: 0b%i\n", pe);
+}
+
+void kernel_main(void)
+{
+	uint16_t in;
+
+	create_gdt();
+	terminal_initialize();
+	keyboard_initialize();
+	welcome_msg();
+
+	display_gdt();
 
 	while (1)
 	{
