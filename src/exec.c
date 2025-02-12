@@ -50,7 +50,15 @@ uint32_t atoi(const char *str)
 	uint32_t res = 0;
 	for (uint32_t i = 0; str[i] != '\0'; ++i)
 	{
-		res = res * 10 + str[i] - '0';
+		uint8_t c = str[i];
+		if (c >= '0' && c <= '9')
+			res = res * 16 + c - '0';
+		else if (c >= 'a' && c <= 'f')
+			res = res * 16 + c - 'a' + 10;
+		else if (c >= 'A' && c <= 'F')
+			res = res * 16 + c - 'A' + 10;
+		else
+			break;
 	}
 	return res;
 }
@@ -90,7 +98,28 @@ void exec(uint32_t row)
 		if (cmd[9] == ' ' && strncmp(cmd + 10, "0x", 2) == 0)
 		{
 			const uint32_t address = atoi(cmd + 12);
-			printk("0x%x: 0x%x\n", address, *(uint32_t *)address);
+			for (uint8_t j = 0; j < 4; j++)
+			{
+				uint32_t cur_address = address + j * 16;
+				printk("0x%x: ", cur_address);
+				for (uint8_t i = 0; i < 4; ++i)
+				{
+					printk("0x%x ", *(uint32_t *)(cur_address + 4 * i));
+				}
+
+				// Print ascii characters
+				for (uint8_t i = 0; i < 16; ++i)
+				{
+					if (i % 4 == 0 && i != 0)
+						printk(" ");
+					const uint8_t c = *(uint8_t *)(cur_address + i);
+					if (c >= 32 && c <= 126)
+						terminal_putchar(c);
+					else
+						terminal_putchar('.');
+				}
+				terminal_putchar('\n');
+			}
 		}
 		else
 		{
