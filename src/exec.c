@@ -45,22 +45,26 @@ void get_cmd(char *cmd, uint32_t row)
 	}
 }
 
-uint32_t atoi(const char *str)
+uint32_t hexstring_to_uint32(const char *str, uint32_t *res)
 {
-	uint32_t res = 0;
-	for (uint32_t i = 0; str[i] != '\0'; ++i)
+	if (!str || !res)
+		return -1;
+
+	uint32_t val = 0;
+	for (uint8_t i = 0; i < 8 && str[i] != '\0'; ++i)
 	{
 		uint8_t c = str[i];
 		if (c >= '0' && c <= '9')
-			res = res * 16 + c - '0';
+			val = val * 16 + (c - '0');
 		else if (c >= 'a' && c <= 'f')
-			res = res * 16 + c - 'a' + 10;
+			val = val * 16 + (c - 'a' + 10);
 		else if (c >= 'A' && c <= 'F')
-			res = res * 16 + c - 'A' + 10;
+			val = val * 16 + (c - 'A' + 10);
 		else
-			break;
+			return -1; // Invalid character
 	}
-	return res;
+	*res = val;
+	return 0;
 }
 
 void exec(uint32_t row)
@@ -97,7 +101,12 @@ void exec(uint32_t row)
 	{
 		if (cmd[9] == ' ' && strncmp(cmd + 10, "0x", 2) == 0)
 		{
-			const uint32_t address = atoi(cmd + 12);
+			uint32_t address;
+			if (hexstring_to_uint32(cmd + 12, &address) != 0)
+			{
+				terminal_write("Invalid hex address\n");
+				return;
+			}
 			for (uint8_t j = 0; j < 4; j++)
 			{
 				uint32_t cur_address = address + j * 16;
