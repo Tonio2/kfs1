@@ -42,3 +42,4 @@ void	terminal_clear(void);
 
 extern void get_gdt(uint32_t *gdt_adress, uint16_t *gdt_size);
 extern void get_pe(uint32_t *pe);
+extern uint32_t	get_eflags(void);

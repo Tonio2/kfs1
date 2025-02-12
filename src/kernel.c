@@ -151,8 +151,8 @@ void terminal_initialize(void)
 			terms[i].buf[j] = vga_entry(' ');
 	}
 
-	/* So that all of the buffer is red */
-	terms[1].color = RED | BLACK << 4;
+	/* Example of color change in a terminal */
+	// terms[1].color = RED | BLACK << 4;
 
 	/* Clear screen and set the cursor */
 	terminal_clear();
@@ -175,42 +175,18 @@ void keyboard_initialize()
 {
 	for (int i = 0; i < 128; ++i)
 		kp_char[i] = 0;
-	kp_char[a] = 'a';
-	kp_char[b] = 'b';
-	kp_char[c] = 'c';
-	kp_char[d] = 'd';
-	kp_char[e] = 'e';
-	kp_char[f] = 'f';
-	kp_char[g] = 'g';
-	kp_char[h] = 'h';
-	kp_char[i] = 'i';
-	kp_char[j] = 'j';
-	kp_char[k] = 'k';
-	kp_char[l] = 'l';
-	kp_char[m] = 'm';
-	kp_char[n] = 'n';
-	kp_char[o] = 'o';
-	kp_char[p] = 'p';
-	kp_char[q] = 'q';
-	kp_char[r] = 'r';
-	kp_char[s] = 's';
-	kp_char[t] = 't';
-	kp_char[u] = 'u';
-	kp_char[v] = 'v';
-	kp_char[w] = 'w';
-	kp_char[x] = 'x';
-	kp_char[y] = 'y';
-	kp_char[z] = 'z';
 
-	kp_char[zero] = '0';
-	kp_char[one] = '1';
-	kp_char[one + 1] = '2';
-	kp_char[one + 2] = '3';
-	kp_char[one + 3] = '4';
-	kp_char[one + 4] = '5';
-	kp_char[one + 5] = '6';
-	kp_char[one + 6] = '7';
-	kp_char[one + 7] = '8';
+	kp_char[a] = 'a'; kp_char[b] = 'b'; kp_char[c] = 'c'; kp_char[d] = 'd';
+	kp_char[e] = 'e'; kp_char[f] = 'f'; kp_char[g] = 'g'; kp_char[h] = 'h';
+	kp_char[i] = 'i'; kp_char[j] = 'j'; kp_char[k] = 'k'; kp_char[l] = 'l';
+	kp_char[m] = 'm'; kp_char[n] = 'n'; kp_char[o] = 'o'; kp_char[p] = 'p';
+	kp_char[q] = 'q'; kp_char[r] = 'r'; kp_char[s] = 's'; kp_char[t] = 't';
+	kp_char[u] = 'u'; kp_char[v] = 'v'; kp_char[w] = 'w'; kp_char[x] = 'x';
+	kp_char[y] = 'y'; kp_char[z] = 'z';
+
+	kp_char[zero] = '0'; kp_char[one] = '1'; kp_char[one + 1] = '2';
+	kp_char[one + 2] = '3'; kp_char[one + 3] = '4'; kp_char[one + 4] = '5';
+	kp_char[one + 5] = '6'; kp_char[one + 6] = '7'; kp_char[one + 7] = '8';
 	kp_char[one + 8] = '9';
 
 	kp_char[dash] = '-';
@@ -258,14 +234,30 @@ void display_gdt() {
 
 void kernel_main(void)
 {
-	uint16_t in;
+	uint16_t				in;
+	uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
+	struct gdt_descriptor	gdtd;
 
-	create_gdt();
+
+	init_gdt();
 	terminal_initialize();
 	keyboard_initialize();
 	welcome_msg();
 
 	display_gdt();
+
+  
+  // switch_term(1);
+	// printk("Welcome to the kernel\n");
+	// get_gdtd(&gdtd);
+	// printk("GDT address: 0x%x\n", gdtd.base);
+	// printk("GDT size: %d\n", gdtd.limit);
+
+	// gdt_seg = (uint32_t *)gdtd.base;
+	// for (uint16_t i = 0; i < (gdtd.limit + 1); i += 8) // Une entrée GDT fait 8 octets (2)
+	// 	printk("GDT[%d]: 0x%x%x\n", i / 8, gdt_seg[i / 4], gdt_seg[i / 4 + 1]);
+	// printk("eflags register: 0b%i\n", get_eflags());
+	// switch_term(0);
 
 	while (1)
 	{

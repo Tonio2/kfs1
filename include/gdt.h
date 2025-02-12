@@ -9,9 +9,9 @@
 #define USER_RING	0b11110000
 
 /* 4 bits + E + DC + RW + A */
-#define DATA		0b00000111
-#define CODE		0b00001011
-#define STACK		0b00000111
+#define CODE		0b00001010
+#define DATA		0b00000010
+#define STACK		0b00000110
 
 
 
@@ -37,5 +37,9 @@ struct gdt
 	struct gdt_descriptor	descriptor;
 };
 
-void		create_gdt(void);
+
+void		init_gdt(void);
+
+extern void	get_gdtd(struct gdt_descriptor *gdtd);
 extern void	load_gdt(void *gdtd);
+extern void	enable_protected_mode(void);
