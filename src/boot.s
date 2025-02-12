@@ -24,7 +24,6 @@ start:
 section .bss
 
 align 16
-gdt_info resb 6
 stack_bottom:
 	resb 16384	; Reserve 16 KiB for stack
 stack_top:
