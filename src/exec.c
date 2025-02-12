@@ -79,6 +79,7 @@ void exec(uint32_t row)
 		terminal_write("clear: clear the screen\n");
 		terminal_write("echo: print the arguments\n");
 		terminal_write("reboot: reboot the system\n");
+		terminal_write("print8mem 0xADDRESS: print 16 * 4 bytes of memory starting at ADDRESS\n");
 	}
 	else if (strcmp(cmd, "clear") == 0)
 	{

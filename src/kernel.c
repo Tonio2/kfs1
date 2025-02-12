@@ -235,8 +235,8 @@ void display_gdt() {
 void kernel_main(void)
 {
 	uint16_t				in;
-	uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
-	struct gdt_descriptor	gdtd;
+	// uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
+	// struct gdt_descriptor	gdtd;
 
 
 	init_gdt();
@@ -246,7 +246,7 @@ void kernel_main(void)
 
 	display_gdt();
 
-  
+
   // switch_term(1);
 	// printk("Welcome to the kernel\n");
 	// get_gdtd(&gdtd);
