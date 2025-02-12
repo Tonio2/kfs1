@@ -38,6 +38,7 @@ struct term {
 
 void	terminal_putchar(char c);
 void	terminal_write(const char* str);
+void	terminal_clear(void);
 
 extern void get_gdt(uint32_t *gdt_adress, uint16_t *gdt_size);
 extern void get_pe(uint32_t *pe);
