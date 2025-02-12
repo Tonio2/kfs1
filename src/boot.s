@@ -1,3 +1,6 @@
+global load_gdt
+global get_gdt
+global get_pe
 global start
 
 extern kernel_main

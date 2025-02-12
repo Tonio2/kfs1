@@ -8,7 +8,7 @@ static void	create_segment(struct gdt_segment *seg, uint8_t ring, uint8_t type)
 	seg->base1 = 0x0000;
 	seg->base2 = 0x00;
 	seg->access = ring | type;
-	seg->flags_limit2 = 0xcf;
+	seg->flags_limit2 = 0xCF;
 	seg->base3 = 0x00;
 }
 
@@ -20,6 +20,7 @@ void		ft_bzero(void *ptr, uint32_t size)
 	for (uint32_t i = 0; i < size; ++i)
 		buf[i] = 0x00;
 }
+
 
 void		init_gdt(void)
 {

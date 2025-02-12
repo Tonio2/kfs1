@@ -37,8 +37,9 @@ struct gdt
 	struct gdt_descriptor	descriptor;
 };
 
+
 void		init_gdt(void);
+
 extern void	get_gdtd(struct gdt_descriptor *gdtd);
 extern void	load_gdt(void *gdtd);
 extern void	enable_protected_mode(void);
-

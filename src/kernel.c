@@ -4,17 +4,18 @@
 #include "cursor.h"
 #include "keycodes.h"
 #include "gdt.h"
+#include "exec.h"
 
-# define NTERM 8
+#define NTERM 8
 
-static struct term		terms[NTERM];
-static struct term *	term = &terms[0];
-static uint16_t * const	term_buffer = (uint16_t *)VGA_BUF_ADDR;
-static char				kp_char[128];
+static struct term terms[NTERM];
+static struct term *term = &terms[0];
+static uint16_t *const term_buffer = (uint16_t *)VGA_BUF_ADDR;
+static char kp_char[128];
 
 /* ########################################################################## */
 
-static uint16_t	vga_entry(char c)
+static uint16_t vga_entry(char c)
 {
 	return ((uint16_t)c | (uint16_t)term->color << 8);
 }
@@ -39,45 +40,44 @@ void switch_term(uint8_t term_idx)
 	set_cursor_coord(term->row, term->col);
 }
 
-
 /* 0:UP, 1:DOWN, 2:LEFT, 3:RIGHT */
-void	terminal_cursor_move(uint8_t dir)
+void terminal_cursor_move(uint8_t dir)
 {
 	switch (dir)
 	{
-		/* UP */
-		case 0:
-			if (term->row > 0)
-				--term->row;
-			break;
+	/* UP */
+	case 0:
+		if (term->row > 0)
+			--term->row;
+		break;
 
-		/* DOWN */
-		case 1:
-			if (term->row < VGA_HEIGHT - 1)
-				++term->row;
-			break;
+	/* DOWN */
+	case 1:
+		if (term->row < VGA_HEIGHT - 1)
+			++term->row;
+		break;
 
-		/* LEFT */
-		case 2:
-			if (term->col <= 0 && term->row != 0)
-			{
-				term->col = VGA_WIDTH - 1;
-				--term->row;
-			}
-			else if (term->col > 0)
-				--term->col;
-			break;
+	/* LEFT */
+	case 2:
+		if (term->col <= 0 && term->row != 0)
+		{
+			term->col = VGA_WIDTH - 1;
+			--term->row;
+		}
+		else if (term->col > 0)
+			--term->col;
+		break;
 
-		/* RIGHT */
-		case 3:
-			if (term->col >= VGA_WIDTH - 1 && term->row != VGA_HEIGHT - 1)
-			{
-				term->col = 0;
-				++term->row;
-			}
-			else if (term->col < VGA_WIDTH - 1)
-				++term->col;
-			break;
+	/* RIGHT */
+	case 3:
+		if (term->col >= VGA_WIDTH - 1 && term->row != VGA_HEIGHT - 1)
+		{
+			term->col = 0;
+			++term->row;
+		}
+		else if (term->col < VGA_WIDTH - 1)
+			++term->col;
+		break;
 	}
 	set_cursor_coord(term->row, term->col);
 }
@@ -96,7 +96,7 @@ static void terminal_scroll(void)
 		term_buffer[i] = vga_entry(' ');
 }
 
-void	terminal_newline()
+void terminal_newline()
 {
 	term->col = 0;
 	if (term->row + 1 >= VGA_HEIGHT)
@@ -106,26 +106,26 @@ void	terminal_newline()
 }
 
 /* Clears the entire screen */
-void	terminal_clear(void)
+void terminal_clear(void)
 {
 	for (uint32_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++)
 		term_buffer[i] = vga_entry(' ');
 }
 
 /* writes a char at the designated coordinates without changing the cursor */
-void	terminal_putchar_at(char c, uint32_t x, uint32_t y)
+void terminal_putchar_at(char c, uint32_t x, uint32_t y)
 {
 	term_buffer[y * VGA_WIDTH + x] = vga_entry(c);
 }
 
-void	terminal_del(void)
+void terminal_del(void)
 {
 	terminal_cursor_move(2);
 	terminal_putchar_at(' ', term->col, term->row);
 	set_cursor_coord(term->row, term->col);
 }
 
-void	terminal_putchar(char c)
+void terminal_putchar(char c)
 {
 	if (c != '\n')
 		terminal_putchar_at(c, term->col++, term->row);
@@ -134,19 +134,19 @@ void	terminal_putchar(char c)
 	set_cursor_coord(term->row, term->col);
 }
 
-void	terminal_write(const char* str)
+void terminal_write(const char *str)
 {
 	for (uint32_t i = 0; str[i]; ++i)
 		terminal_putchar(str[i]);
 }
 
-void	terminal_initialize(void)
+void terminal_initialize(void)
 {
 	for (uint8_t i = 0; i < NTERM; ++i)
 	{
-		terms[i].row	= 0;
-		terms[i].col	= 0;
-		terms[i].color	= LIGHT_GREY | BLACK << 4;
+		terms[i].row = 0;
+		terms[i].col = 0;
+		terms[i].color = LIGHT_GREY | BLACK << 4;
 		for (uint32_t j = 0; j < VGA_HEIGHT * VGA_WIDTH; j++)
 			terms[i].buf[j] = vga_entry(' ');
 	}
@@ -160,7 +160,7 @@ void	terminal_initialize(void)
 	set_cursor_coord(term->row, term->col);
 }
 
-void term_rainbow_write(const char* str)
+void term_rainbow_write(const char *str)
 {
 	static uint8_t colors[8] = {RED, LIGHT_RED, LIGHT_BROWN, LIGHT_GREEN, CYAN, LIGHT_BLUE, MAGENTA, WHITE};
 
@@ -171,10 +171,11 @@ void term_rainbow_write(const char* str)
 	}
 }
 
-void	keyboard_initialize()
+void keyboard_initialize()
 {
 	for (int i = 0; i < 128; ++i)
 		kp_char[i] = 0;
+
 	kp_char[a] = 'a'; kp_char[b] = 'b'; kp_char[c] = 'c'; kp_char[d] = 'd';
 	kp_char[e] = 'e'; kp_char[f] = 'f'; kp_char[g] = 'g'; kp_char[h] = 'h';
 	kp_char[i] = 'i'; kp_char[j] = 'j'; kp_char[k] = 'k'; kp_char[l] = 'l';
@@ -188,11 +189,13 @@ void	keyboard_initialize()
 	kp_char[one + 5] = '6'; kp_char[one + 6] = '7'; kp_char[one + 7] = '8';
 	kp_char[one + 8] = '9';
 
-	kp_char[dash] = '-'; kp_char[equal] = '='; kp_char[enter] = '\n';
+	kp_char[dash] = '-';
+	kp_char[equal] = '=';
+	kp_char[enter] = '\n';
 	kp_char[space] = ' ';
 }
 
-void	welcome_msg()
+void welcome_msg()
 {
 	term_rainbow_write("\n\n\n\n\n");
 	term_rainbow_write("               :::     ::::::::        :::    ::: ::::::::: ::::::::: \n");
@@ -208,19 +211,11 @@ void	welcome_msg()
 	term_rainbow_write("                             School 42                                \n");
 }
 
-void	kernel_main(void)
-{
-	uint16_t				in;
+void display_gdt() {
 	uint32_t				*gdt_seg;	/* one segment takes 2 elements here */
 	struct gdt_descriptor	gdtd;
 
-	init_gdt();
-	terminal_initialize();
-	keyboard_initialize();
-	welcome_msg();
 
-// ----- potentiellement a mettre dans une fonction
-	switch_term(1);
 	printk("Welcome to the kernel\n");
 	get_gdtd(&gdtd);
 	printk("GDT address: 0x%x\n", gdtd.base);
@@ -230,8 +225,19 @@ void	kernel_main(void)
 	for (uint16_t i = 0; i < (gdtd.limit + 1); i += 8) // Une entrée GDT fait 8 octets (2)
 		printk("GDT[%d]: 0x%x%x\n", i / 8, gdt_seg[i / 4], gdt_seg[i / 4 + 1]);
 	printk("eflags register: 0b%i\n", get_eflags());
-	switch_term(0);
-// -----
+}
+
+void kernel_main(void)
+{
+	uint16_t				in;
+
+
+	init_gdt();
+	terminal_initialize();
+	keyboard_initialize();
+	welcome_msg();
+
+	display_gdt();
 
 	while (1)
 	{
@@ -248,30 +254,62 @@ void	kernel_main(void)
 
 			/* print characters if keypress is mapped */
 			if (!(in & 0b10000000) && kp_char[in & 0b01111111])
+			{
 				terminal_putchar(kp_char[in & 0x7f]);
+				if (kp_char[in & 0x7f] == '\n')
+				{
+					exec(term->row - 1);
+				}
+			}
 
 			/* special function key */
 			switch (in & 0xff)
 			{
-				case del:		terminal_del(); break;
+			case del:
+				terminal_del();
+				break;
 
-				case f1:		switch_term(0); break;
-				case f2:		switch_term(1); break;
-				case f3:		switch_term(2); break;
-				case f4:		switch_term(3); break;
-				case f5:		switch_term(4); break;
-				case f6:		switch_term(5); break;
-				case f7:		switch_term(6); break;
-				case f8:		switch_term(7); break;
+			case f1:
+				switch_term(0);
+				break;
+			case f2:
+				switch_term(1);
+				break;
+			case f3:
+				switch_term(2);
+				break;
+			case f4:
+				switch_term(3);
+				break;
+			case f5:
+				switch_term(4);
+				break;
+			case f6:
+				switch_term(5);
+				break;
+			case f7:
+				switch_term(6);
+				break;
+			case f8:
+				switch_term(7);
+				break;
 
-				case extended:
-					switch ((in >> 8) & 0xff)
-					{
-						case up:	terminal_cursor_move(0); break;
-						case down:	terminal_cursor_move(1); break;
-						case left:	terminal_cursor_move(2); break;
-						case right:	terminal_cursor_move(3); break;
-					}
+			case extended:
+				switch ((in >> 8) & 0xff)
+				{
+				case up:
+					terminal_cursor_move(0);
+					break;
+				case down:
+					terminal_cursor_move(1);
+					break;
+				case left:
+					terminal_cursor_move(2);
+					break;
+				case right:
+					terminal_cursor_move(3);
+					break;
+				}
 				break;
 
 				// case esc: asm("hlt"); break;

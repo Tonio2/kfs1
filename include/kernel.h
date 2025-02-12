@@ -36,8 +36,10 @@ struct term {
 	uint16_t buf[VGA_WIDTH * VGA_HEIGHT];
 };
 
-void			terminal_putchar(char c);
-void			terminal_write(const char* str);
+void	terminal_putchar(char c);
+void	terminal_write(const char* str);
+void	terminal_clear(void);
 
-/* code is in gdt.s */
+extern void get_gdt(uint32_t *gdt_adress, uint16_t *gdt_size);
+extern void get_pe(uint32_t *pe);
 extern uint32_t	get_eflags(void);
